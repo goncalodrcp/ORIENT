@@ -1,0 +1,20 @@
+package apriltag_lcm;
+
+struct TagPose_t
+{
+	int32_t id;
+	int32_t hammingDistance;
+	double  p[4][2];
+	double  cxy[2];
+	double  homography[3][3];
+	string  familyName;
+	double  R[3][3];
+	double  t[3];
+}
+
+struct TagPoseArray_t
+{
+	int64_t   timestamp;
+	int32_t   num_detections;
+	TagPose_t detections[num_detections];
+}
