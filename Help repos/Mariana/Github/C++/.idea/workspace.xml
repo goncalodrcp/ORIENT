@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="main.cpp" targetName="main" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1b2254cd-5c97-43f5-ae2c-68714e152f63" name="Default Changelist" comment="\">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/image.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rotation.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/rotation.cpp" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1Q11ml3AkKZNgYYE6O8VnC2CQhY" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="main.cpp" TARGET_NAME="main" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="main.cpp" RUN_TARGET_NAME="main">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1b2254cd-5c97-43f5-ae2c-68714e152f63" name="Default Changelist" comment="" />
+      <created>1554930046202</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1554930046202</updated>
+      <workItem from="1554930048162" duration="13158000" />
+      <workItem from="1555759121023" duration="3624000" />
+      <workItem from="1561386333279" duration="6803000" />
+      <workItem from="1562184431124" duration="26000" />
+      <workItem from="1566923451641" duration="50000" />
+      <workItem from="1566982261282" duration="17229000" />
+      <workItem from="1567158388343" duration="26425000" />
+      <workItem from="1567414217774" duration="13937000" />
+      <workItem from="1567447792554" duration="2631000" />
+      <workItem from="1567465388405" duration="1315000" />
+      <workItem from="1567503779266" duration="5179000" />
+      <workItem from="1567521209670" duration="3018000" />
+      <workItem from="1567524374630" duration="117000" />
+      <workItem from="1567524528952" duration="84000" />
+      <workItem from="1567524813577" duration="6812000" />
+      <workItem from="1567679608204" duration="9778000" />
+      <workItem from="1567763397054" duration="22688000" />
+      <workItem from="1567931267786" duration="26200000" />
+      <workItem from="1568035742882" duration="4665000" />
+      <workItem from="1568043479225" duration="142000" />
+      <workItem from="1568287888599" duration="1529000" />
+      <workItem from="1568289652697" duration="13668000" />
+      <workItem from="1568385632033" duration="16298000" />
+      <workItem from="1568728334864" duration="39159000" />
+      <workItem from="1568913281540" duration="55290000" />
+      <workItem from="1569583720454" duration="16469000" />
+      <workItem from="1569689592210" duration="1630000" />
+      <workItem from="1569691346673" duration="15782000" />
+      <workItem from="1569853044133" duration="6885000" />
+      <workItem from="1570099429173" duration="8576000" />
+      <workItem from="1570185537675" duration="634000" />
+      <workItem from="1570198304788" duration="13859000" />
+      <workItem from="1570370881921" duration="16336000" />
+      <workItem from="1570457790555" duration="17127000" />
+      <workItem from="1570918614658" duration="27245000" />
+      <workItem from="1572266242522" duration="5529000" />
+      <workItem from="1572277217491" duration="313000" />
+      <workItem from="1572277573985" duration="313000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/../../.." />
+    </ignored-roots>
+  </component>
+</project>
