@@ -1,0 +1,12 @@
+# General sensor definitions.
+sensor_type: pointcloud
+comment: Pointcloud recorded with a Leica Nova MS50 from 6 different positions.
+
+# Sensor extrinsics wrt. the world-frame.
+T_WR:
+  cols: 4
+  rows: 4
+  data: [1.0, 0.0, 0.0, 0.0,
+         0.0, 1.0, 0.0, 0.0,
+         0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 1.0]
