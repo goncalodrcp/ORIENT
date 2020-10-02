@@ -1,9 +1,9 @@
 %data comes from the EUROC MAV dataset V1_01_medium
 clear;
 close all;
-addpath myToolbox
-addpath filters
-addpath data
+addpath ../LieGroupToolbox
+addpath ../filters
+addpath ../data
 
 tMin = 1081; % starting IMU time
 tImagesMin = 109; % starting camera time
@@ -12,8 +12,8 @@ tImagesMin = 109; % starting camera time
 freqIMU = 200; %Hz
 freqCam = 20; %Hz
 
-ParamGlobal.dirImage = 'V1_02_medium/mav0/cam0/data/';
-dirImage = 'V1_02_medium/mav0/cam0/data/';
+ParamGlobal.dirImage = '../V1_02_medium/mav0/cam0/data/';
+dirImage = '../V1_02_medium/mav0/cam0/data/';
 fileData = 'DATA_MEDIUM.mat';
 fileImages = 'fileImages_MEDIUM.mat';
 offset = 881;
@@ -85,7 +85,7 @@ ParamFilter.cameraParams = cameraParameters('IntrinsicMatrix', ParamFilter.Pi',.
     'TangentialDistortion',[0.00019359, 1.76187114e-05]);
 
 % Initialisation of the state is obtained following [Mur-Artal,2017],
-load('data/ORB_SLAM_init.mat');
+load('../data/ORB_SLAM_init.mat');
 Rot0 = eul2rotm([trajReal.psi(1),trajReal.theta(1),trajReal.phi(1)]);
 x0 = trajReal.x(:,1);
 v0 = trajReal.v(:,1);
