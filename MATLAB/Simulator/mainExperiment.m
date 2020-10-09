@@ -155,16 +155,16 @@ P_I = blkdiag(P0);
 for i = 2:NbStepsMax
     % propagation
     dt = t(i)-t(i-1);
-    omega_i = omega(:,i);
-    acc_i = acc(:,i);
+    omega_i = omega(:,i); %Input angular velocity from gyroscope
+    acc_i = acc(:,i); %Input acceleration from accelerometer
     
-    chiAntR = chiR;
-    RotR = RotR*expSO3((omega_i-omega_bR)*dt);
-    vR = vR+(RotR*(acc_i-a_bR)+g)*dt;
-    xR = xR+vR*dt;
-    chiR = state2chi(RotR,vR,xR,PosAmersR);
+    chiAntR = chiR; % Save non propagated state
+    RotR = RotR*expSO3((omega_i-omega_bR)*dt); %Propagate mean (see time discretization)
+    vR = vR+(RotR*(acc_i-a_bR)+g)*dt; %Propagate mean (see time discretization)
+    xR = xR+vR*dt; %Propagate mean (see time discretization)
+    chiR = state2chi(RotR,vR,xR,PosAmersR); %State to Chi again (including the propagated changes)
     S_R = rukfPropagation(dt,chiR,chiAntR,omega_bR,a_bR,S_R,omega_i,...
-        acc_i,Qc,g);
+        acc_i,Qc,g); %Sigma point generation and covariance propagation
     
     % propagation for others filters
     chiAntL = chiL;
