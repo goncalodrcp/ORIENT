@@ -1,4 +1,4 @@
-function [chi,omega_b,a_b,S] = rukfUpdate(chi,omega_b,a_b,...
+function [chi,omega_b,a_b,S,pC_1,pC_2] = rukfUpdate(chi,omega_b,a_b,...
     S,y,param,R,ParamFilter)
 param.Pi = ParamFilter.Pi;
 param.chiC = ParamFilter.chiC;
@@ -19,11 +19,13 @@ beta = 2;
 % Compute transformed measurement
 X = gamma*[zeros(N_aug,1) S_aug' -S_aug'];% sigma-points
 Y = zeros(k,2*N_aug+1);
-Y(:,1) = h(chi,zeros(q-6,1),param,zeros(N_aug-q,1));
+pC_1 = zeros(3,2*N_aug+1);
+pC_2 = zeros(3,2*N_aug+1);
+[Y(:,1),pC_1,pC_2] = h(chi,zeros(q-6,1),param,zeros(N_aug-q,1));
 for j = 2:2*N_aug+1
     xi_j = X([1:9 16:q],j);
     v_j = X(q+1:N_aug,j);
-    Y(:,j) = h(chi,xi_j,param,v_j);
+    [Y(:,j),pC_1,pC_2] = h(chi,xi_j,param,v_j);
 end
 ybar = W0*Y(:,1) + Wj*sum(Y(:,2:end),2);% Measurement mean
 Y(:,1) = sqrt(abs(W0+(1-alpha^2+beta)))*(Y(:,1)-ybar);
@@ -56,7 +58,7 @@ S = S*J;
 end
 
 %--------------------------------------------------------------------------
-function y = h(chi,xi,param,v)
+function [y,pC_1,pC_2] = h(chi,xi,param,v)
 Pi = param.Pi;
 chiC = param.chiC;
 RotC = chiC(1:3,1:3);
@@ -70,6 +72,9 @@ Rot = chi_j(1:3,1:3);
 x = chi_j(1:3,5);
 PosAmers = chi_j(1:3,6:end);
 posAmers = PosAmers(:,yAmers);
+pC_1 = (Rot*RotC)'*(posAmers-kron(x,ones(1,NbAmers))) - kron(xC,ones(1,NbAmers));
+pC_2 = RotC*(Rot'*posAmers-kron(x,ones(1,NbAmers))) + kron(xC,ones(1,NbAmers));
+
 z = Pi*( (Rot*RotC)'*(posAmers-kron(x,ones(1,NbAmers))) ...
     - kron(xC,ones(1,NbAmers)));
 y = z(1:2,:)./z(3,:);

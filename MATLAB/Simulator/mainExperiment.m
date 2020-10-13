@@ -207,7 +207,7 @@ for i = 2:NbStepsMax
         
         % update state
         param.yAmers = yAmers;
-        [chiR,omega_bR,a_bR,S_R] = rukfUpdate(chiR,omega_bR,...
+        [chiR,omega_bR,a_bR,S_R,pC_1,pC_2] = rukfUpdate(chiR,omega_bR,...
             a_bR,S_R,y,param,R,ParamFilter);
         [RotR,vR,xR,PosAmersR] = chi2state(chiR);
         
