@@ -1,3 +1,6 @@
+%% Main experiment
+%
+%
 %data comes from the EUROC MAV dataset V1_01_medium
 clear;
 close all;
@@ -5,48 +8,35 @@ addpath ../LieGroupToolbox
 addpath ../filters
 addpath ../data
 
-tMin = 1081; % starting IMU time
-tImagesMin = 109; % starting camera time
+%Assign directory where images can be found
+dirImage = '../V1_02_medium/mav0/cam0/data/';
+%IMU and ground-truth data
+fileData = 'DATA_MEDIUM.mat';
+%Image names and time instants
+fileImages = 'fileImages_MEDIUM.mat';
 
-%% Initialization
+%Frequency of acquisition
 freqIMU = 200; %Hz
 freqCam = 20; %Hz
 
-ParamGlobal.dirImage = '../V1_02_medium/mav0/cam0/data/';
-dirImage = '../V1_02_medium/mav0/cam0/data/';
-fileData = 'DATA_MEDIUM.mat';
-fileImages = 'fileImages_MEDIUM.mat';
 offset = 881;
+tMin = 1081; % starting IMU time
+tImagesMin = 109; % starting camera time
 
-% IMU and frame date
-load(fileData);
-t = tIMU;
-t = t/10^9; % ns -> s
-g = 9.81*[0;0;-1]; %gravity field
-omega = omega(:,tMin:end);
-acc = acc(:,tMin:end);
-t = t(tMin:end);
-tIMU = tIMU(tMin:end);
-ParamGlobal.tIMU = tIMU;
-NbSteps = length(tIMU);
 NbStepsMax = 8000;
 
-load(fileImages); 
-tImages = tImages(tImagesMin:end);
-fileImages = fileImages(tImagesMin:end);
-ParamGlobal.fileImages = fileImages;
-%corect offset
-tReal(1:offset) = [];
-trajReal.x(:,1:offset) = []; 
-trajReal.v(:,1:offset) = [];
-trajReal.quat(1:offset) = [];
-trajReal.psi(1:offset) = [];
-trajReal.theta(1:offset) = [];
-trajReal.phi(1:offset) = [];
-trajReal.omega_b(:,1:offset) = [];
-trajReal.a_b(:,1:offset) = [];
-obsTimes = zeros(length(t),1);
-obsTimes(1:10:end) = 1; % IMU is 10 times faster than camera
+%% Initialization
+
+[ParamGlobal,IMU_data,CAM_data,GT_data] = init_IMU_CAM(tMin,tImagesMin,fileData,fileImages);
+
+%% Correct offset
+
+[GT_data.tReal, GT_data.trajReal] = correctOffset(GT_data.tReal, GT_data.trajReal, offset);
+
+%%
+
+obsTimes = zeros(length(ParamGlobal.t),1);
+obsTimes(1:freqIMU/freqCam:end) = 1; % IMU is 10 times faster than camera
 
 %% Init Filter
 P0amers = diag([1;1;1]*1.e-3); %initial landmark covariance
