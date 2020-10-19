@@ -39,13 +39,47 @@ obsTimes = zeros(length(ParamGlobal.t),1);
 obsTimes(1:freqIMU/freqCam:end) = 1; % IMU is 10 times faster than camera
 
 %% Init Filter
-P0amers = diag([1;1;1]*1.e-3); %initial landmark covariance
-R = 1.0^2*eye(2); %measurement noise for one landmark
+
+%Use 'readmatrix' function with combination with
+%'delimitedTextImportOptions' to set import requirements
+%import sensor parameters from .yaml files. First convert them into a .txt
+%file
+%Example:
+%opts = delimitedTextImportOptions('CommentStyle','%');
+%opts = setvartype(opts,'double');
+%A = readmatrix('modelParam.txt',opts);
+
+%Import parameters
+opts = delimitedTextImportOptions('CommentStyle','%');
+opts = setvartype(opts,'double');
+noiseIMU = readmatrix('IMU_noise_param.txt',opts); %array with IMU noise parameters
+T_IC = readmatrix('extrinsics.txt',opts); %extrinsics -> Transformation from camera frame to IMU (body) frame
+camParam = readmatrix('camParameters.txt',opts); %instrincs and distortion model
+
+%Noise parameters of IMU (Process noise)
+gyro_noise_density = noiseIMU(1);  %[ rad / s / sqrt(Hz) ]   ( gyro "white noise" )
+gyro_random_walk = noiseIMU(2);   %[ rad / s^2 / sqrt(Hz) ] ( gyro bias diffusion )
+acc_noise_density = noiseIMU(3);  %[ m / s^2 / sqrt(Hz) ]   ( accel "white noise" )
+acc_random_walk = noiseIMU(4);   %[ m / s^3 / sqrt(Hz) ].  ( accel bias diffusion )
+
+%Camera specifications
+res = [752 480];
+K = [camParam(1,1) 0 camParam(1,3);0 camParam(1,2) camParam(1,4);0 0 1]; %intrinsics matrix
+%Distortion model
+%Radial
+k1 = camParam(2,1);
+k2 = camParam(2,2);
+%Tangencial
+p1 = camParam(2,3);
+p2 = camParam(2,4);
+
+%%%%%%
 ParamFilter.NbAmers = 30; %nominal number of landmarks in the state
 ParamFilter.NbAmersMin = ParamFilter.NbAmers;
 ParamFilter.EcartPixelMax = 20;
 
 % init covariance
+P0amers = diag([1;1;1]*1.e-3); %initial landmark covariance
 p0Rot = (0.01*pi/180)^2;
 p0v =  1.e-4;
 p0x =  1.e-8;
@@ -55,6 +89,7 @@ P0 = diag([p0Rot*ones(3,1);p0v*ones(3,1);p0x*ones(3,1);...
     p0omegab*ones(3,1);p0ab*ones(3,1)]);
 
 % process noises
+R = 1.0^2*eye(2); %measurement noise for one landmark
 q_omega = (1.6968e-4)^2*200;
 q_a = (2e-3)^2*200;
 q_omegab = (1.9393e-5)^2*200;
@@ -81,6 +116,8 @@ x0 = trajReal.x(:,1);
 v0 = trajReal.v(:,1);
 omega_b0 = orb_slam.omega_b;
 a_b0 = orb_slam.a_b;
+
+
 PosAmers0 = orb_slam.PosAmers;
 trackerMain = orb_slam.trackerMain;
 trackerBis = orb_slam.trackerBis;
