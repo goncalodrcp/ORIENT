@@ -25,7 +25,7 @@ tImagesMin = 109; % starting camera time
 
 NbStepsMax = 8000;
 
-%% Initialization
+%% Definition of global parameters and data structures
 
 [ParamGlobal,IMU_data,CAM_data,GT_data] = init_IMU_CAM(tMin,tImagesMin,fileData,fileImages);
 
@@ -38,7 +38,7 @@ NbStepsMax = 8000;
 obsTimes = zeros(length(ParamGlobal.t),1);
 obsTimes(1:freqIMU/freqCam:end) = 1; % IMU is 10 times faster than camera
 
-%% Init Filter
+%% Initialze Filter
 
 %Use 'readmatrix' function with combination with
 %'delimitedTextImportOptions' to set import requirements
@@ -49,36 +49,31 @@ obsTimes(1:freqIMU/freqCam:end) = 1; % IMU is 10 times faster than camera
 %opts = setvartype(opts,'double');
 %A = readmatrix('modelParam.txt',opts);
 
+%General parameters
+NLand = 30; %number of landmarks
+NLandMin = NLand; %minimum number of landmarks
+pixelErr = 20; %pixel error threshold
+
 %Import parameters
 opts = delimitedTextImportOptions('CommentStyle','%');
 opts = setvartype(opts,'double');
 noiseIMU = readmatrix('IMU_noise_param.txt',opts); %array with IMU noise parameters
 T_IC = readmatrix('extrinsics.txt',opts); %extrinsics -> Transformation from camera frame to IMU (body) frame
 camParam = readmatrix('camParameters.txt',opts); %instrincs and distortion model
-
-%Noise parameters of IMU (Process noise)
-gyro_noise_density = noiseIMU(1);  %[ rad / s / sqrt(Hz) ]   ( gyro "white noise" )
-gyro_random_walk = noiseIMU(2);   %[ rad / s^2 / sqrt(Hz) ] ( gyro bias diffusion )
-acc_noise_density = noiseIMU(3);  %[ m / s^2 / sqrt(Hz) ]   ( accel "white noise" )
-acc_random_walk = noiseIMU(4);   %[ m / s^3 / sqrt(Hz) ].  ( accel bias diffusion )
-
-%Camera specifications
+%Camera resolution
 res = [752 480];
-K = [camParam(1,1) 0 camParam(1,3);0 camParam(1,2) camParam(1,4);0 0 1]; %intrinsics matrix
-%Distortion model
-%Radial
-k1 = camParam(2,1);
-k2 = camParam(2,2);
-%Tangencial
-p1 = camParam(2,3);
-p2 = camParam(2,4);
 
-%%%%%%
-ParamFilter.NbAmers = 30; %nominal number of landmarks in the state
-ParamFilter.NbAmersMin = ParamFilter.NbAmers;
-ParamFilter.EcartPixelMax = 20;
+%Initialize filter
+ParamFilter = init_filter(NLand,NLandMin,pixelErr,noiseIMU,camParam,T_IC);
 
-% init covariance
+%% State initialization
+
+%Number of steps
+NbSteps = ParamGlobal.NbSteps;
+%Ground truth trajectory
+trajReal = GT_data.trajReal;
+
+%Initial covariance
 P0amers = diag([1;1;1]*1.e-3); %initial landmark covariance
 p0Rot = (0.01*pi/180)^2;
 p0v =  1.e-4;
@@ -87,98 +82,107 @@ p0omegab = 1.e-6;
 p0ab = 1.e-6;
 P0 = diag([p0Rot*ones(3,1);p0v*ones(3,1);p0x*ones(3,1);...
     p0omegab*ones(3,1);p0ab*ones(3,1)]);
-
-% process noises
-R = 1.0^2*eye(2); %measurement noise for one landmark
-q_omega = (1.6968e-4)^2*200;
-q_a = (2e-3)^2*200;
-q_omegab = (1.9393e-5)^2*200;
-q_ab = (3e-3)^2*200;
-Q = diag([q_omega*ones(3,1);q_a*ones(3,1);q_omegab* ...
-    ones(3,1);q_ab*ones(3,1)]);
-Qc = chol(Q);
 P0 = blkdiag(P0,kron(eye(ParamFilter.NbAmers),P0amers));
 
-%depending on the chosen camera %cam0
-ParamFilter.chiC = [0.0148655429818, -0.999880929698, 0.00414029679422, -0.0216401454975;
-    0.999557249008, 0.0149672133247, 0.025715529948, -0.064676986768;
-    -0.0257744366974, 0.00375618835797, 0.999660727178, 0.00981073058949;
-    0.0, 0.0, 0.0, 1.0]; % camera pose
-ParamFilter.Pi = [458.654 0 0; 0 457.296 0; 367.215, 248.375 1]';%camera calibration matrix
-ParamFilter.cameraParams = cameraParameters('IntrinsicMatrix', ParamFilter.Pi',...
-    'RadialDistortion',[-0.28340811, 0.07395907],...
-    'TangentialDistortion',[0.00019359, 1.76187114e-05]);
-
-% Initialisation of the state is obtained following [Mur-Artal,2017],
+%Initialisation of the state is obtained following [Mur-Artal,2017],
 load('../data/ORB_SLAM_init.mat');
 Rot0 = eul2rotm([trajReal.psi(1),trajReal.theta(1),trajReal.phi(1)]);
 x0 = trajReal.x(:,1);
 v0 = trajReal.v(:,1);
 omega_b0 = orb_slam.omega_b;
 a_b0 = orb_slam.a_b;
-
-
 PosAmers0 = orb_slam.PosAmers;
+
+%%%%%%
 trackerMain = orb_slam.trackerMain;
 trackerBis = orb_slam.trackerBis;
 myTracks = orb_slam.myTracks;
+%%%%%%
 
-IdxImage = 2; % image index
+Q = ParamFilter.Q; %Process noise covariance
+Qc = chol(Q); %cholesky decomposition
 
+%Left-UKF-LG
 trajL = initTraj(NbSteps);
-RotL = Rot0;
-vL = v0;
-xL = x0;
-omega_bL = omega_b0;
-a_bL = a_b0;
-PosAmersL = PosAmers0;
-P_L = P0;
-S_L = chol(P_L);
-chiL = state2chi(RotL,vL,xL,PosAmersL);
+[stateL_0,PL_0] = stateStruct(Rot0,v0,x0,omega_b0,a_b0,PosAmers0,P0);
+SL_0 = chol(PL_0);
+chiL_0 = state2chi(stateL_0.Rot,stateL_0.v,stateL_0.o,stateL_0.pLand);
+% RotL = Rot0;
+% vL = v0;
+% xL = x0;
+% omega_bL = omega_b0;
+% a_bL = a_b0;
+% PosAmersL = PosAmers0;
+% P_L = P0;
+% S_L = chol(P_L);
+% chiL = state2chi(RotL,vL,xL,PosAmersL);
 
+
+%Right-UKF-LG
 trajR = initTraj(NbSteps);
-RotR = Rot0;
-vR = v0;
-xR = x0;
-omega_bR = omega_b0;
-a_bR = a_b0;
-PosAmersR = PosAmers0;
-P_R = P0;
-S_R = chol(P_R);
-chiR = state2chi(RotR,vR,xR,PosAmersR);
+[stateR_0,PR_0] = stateStruct(Rot0,v0,x0,omega_b0,a_b0,PosAmers0,P0);
+SR_0 = chol(PR_0);
+chiR_0 = state2chi(stateR_0.Rot,stateR_0.v,stateR_0.o,stateR_0.pLand);
+% trajR = initTraj(NbSteps);
+% RotR = Rot0;
+% vR = v0;
+% xR = x0;
+% omega_bR = omega_b0;
+% a_bR = a_b0;
+% PosAmersR = PosAmers0;
+% P_R = P0;
+% S_R = chol(P_R);
+% chiR = state2chi(RotR,vR,xR,PosAmersR);
 
+%SE(3)-UKF
 trajRef = initTraj(NbSteps);
-RotRef = Rot0;
-vRef = v0;
-xRef = x0;
-omega_bRef = omega_b0;
-a_bRef = a_b0;
-PosAmersRef = PosAmers0;
-P_Ref = blkdiag(P0);
-S_Ref = chol(P_Ref);
-chiRef = [RotRef xRef;0 0 0 1];
-xidotRef = zeros(6,1);
+[stateRef_0,PRef_0] = stateStruct(Rot0,v0,x0,omega_b0,a_b0,PosAmers0,P0);
+PRef_0 = blkdiag(PRef_0);
+SRef_0 = chol(PRef_0);
+chiRef_0 = [stateRef_0.Rot stateRef_0.o;0 0 0 1];
+xidotRef_0 = zeros(6,1);
+% trajRef = initTraj(NbSteps);
+% RotRef = Rot0;
+% vRef = v0;
+% xRef = x0;
+% omega_bRef = omega_b0;
+% a_bRef = a_b0;
+% PosAmersRef = PosAmers0;
+% P_Ref = blkdiag(P0);
+% S_Ref = chol(P_Ref);
+% chiRef = [RotRef xRef;0 0 0 1];
+% xidotRef = zeros(6,1);
 
+%UKF
 trajU = initTraj(NbSteps);
-RotU = Rot0;
-vU = v0;
-xU = x0;
-omega_bU = omega_b0;
-a_bU = a_b0;
-PosAmersU = PosAmers0;
-P_U = blkdiag(P0);
-S_U = chol(P_U);
+[stateU_0,PU_0] = stateStruct(Rot0,v0,x0,omega_b0,a_b0,PosAmers0,P0);
+PU_0 = blkdiag(PU_0);
+SU_0 = chol(PU_0);
+% trajU = initTraj(NbSteps);
+% RotU = Rot0;
+% vU = v0;
+% xU = x0;
+% omega_bU = omega_b0;
+% a_bU = a_b0;
+% PosAmersU = PosAmers0;
+% P_U = blkdiag(P0);
+% S_U = chol(P_U);
 
+%IEKF
 trajI = initTraj(NbSteps);
-RotI = Rot0;
-vI = v0;
-xI = x0;
-omega_bI = omega_b0;
-a_bI = a_b0;
-PosAmersI = PosAmers0;
-P_I = blkdiag(P0);
+[stateI_0,PI_0] = stateStruct(Rot0,v0,x0,omega_b0,a_b0,PosAmers0,P0);
+PI_0 = blkdiag(PI_0);
+% trajI = initTraj(NbSteps);
+% RotI = Rot0;
+% vI = v0;
+% xI = x0;
+% omega_bI = omega_b0;
+% a_bI = a_b0;
+% PosAmersI = PosAmers0;
+% P_I = blkdiag(P0);
 
 %% Filtering
+IdxImage = 2; % image index
 for i = 2:NbStepsMax
     % propagation
     dt = t(i)-t(i-1);
