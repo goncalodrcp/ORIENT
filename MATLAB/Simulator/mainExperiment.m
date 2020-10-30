@@ -96,7 +96,7 @@ PosAmers0 = orb_slam.PosAmers;
 %%%%%%
 trackerMain = orb_slam.trackerMain;
 trackerBis = orb_slam.trackerBis;
-myTracks = orb_slam.myTracks;
+myTracks = orb_slam.myTracks;10
 %%%%%%
 
 Q = ParamFilter.Q; %Process noise covariance
@@ -127,7 +127,7 @@ chiR_0 = state2chi(stateR_0.Rot,stateR_0.v,stateR_0.o,stateR_0.pLand);
 % RotR = Rot0;
 % vR = v0;
 % xR = x0;
-% omega_bR = omega_b0;
+% omega_bR = omega_b0;ParamFilter
 % a_bR = a_b0;
 % PosAmersR = PosAmers0;
 % P_R = P0;
