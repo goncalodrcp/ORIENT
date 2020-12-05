@@ -85,6 +85,7 @@ P0 = diag([p0Rot*ones(3,1);p0v*ones(3,1);p0x*ones(3,1);...
 P0 = blkdiag(P0,kron(eye(ParamFilter.NbAmers),P0amers));
 
 %Initialisation of the state is obtained following [Mur-Artal,2017],
+%Map initialisation
 load('../data/ORB_SLAM_init.mat');
 Rot0 = eul2rotm([trajReal.psi(1),trajReal.theta(1),trajReal.phi(1)]);
 x0 = trajReal.x(:,1);
