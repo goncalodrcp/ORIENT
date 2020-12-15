@@ -41,7 +41,8 @@ ParamFilter.T_IC = T_IC; % camera pose
 ParamFilter.K = K;%camera calibration matrix
 %Why do they transpose K? (below)
 %Testing without the trasnpose
-ParamFilter.cameraParams = cameraParameters('IntrinsicMatrix', ParamFilter.K,...
+%Apparently that's the format that MATLAB uses.
+ParamFilter.cameraParams = cameraParameters('IntrinsicMatrix', ParamFilter.K',...
     'RadialDistortion',[k1, k2],...
     'TangentialDistortion',[p1, p2]);
 ParamFilter.Q = Q; %Process noise covariance matrix
