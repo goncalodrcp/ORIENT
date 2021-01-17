@@ -85,3 +85,5 @@ P0 = blkdiag(P0,kron(eye(ParamFilter.NbAmers),P0amers));
 %Initialisation of the state is obtained following [Mur-Artal,2017],
 %Map initialisation
 [inState,imds,mapPointSet,vSetKeyFrames] = initORBSLAM(ParamGlobal,ParamFilter,GT_data);
+
+
