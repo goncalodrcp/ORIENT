@@ -1,0 +1,3 @@
+/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/Mariana/C++examples/build/CMakeFiles/rebuild_cache.dir
+/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/Mariana/C++examples/build/CMakeFiles/edit_cache.dir
+/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/Mariana/C++examples/build/CMakeFiles/recordSensorData.dir
