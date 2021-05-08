@@ -1,2 +1,2 @@
-# ORIENT
-Repository for the project code - "Oculomotor Control System"
+# OptiTrack - Motion Capture System
+
