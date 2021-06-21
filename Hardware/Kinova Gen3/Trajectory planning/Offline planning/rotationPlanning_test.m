@@ -10,9 +10,9 @@ close all;
 
 addpath('../Utilities')
 
-%Original files from MATLAB blog post
-load gen3
-gen3.Gravity = [0 0 -9.81];
+%Load 3D Model of the robot with custom gripper
+loadSTL;
+
 %load gen3positions %1st configuration 
 load robotConfig2 %2nd configuration
 %TO DO: verify these configurations 
@@ -57,7 +57,7 @@ yawAngles = 0:stepYaw:yawMaxAngle;
 rollAngles = 0:stepRoll:rollMaxAngle;
 pitchAngles = 0:stepPitch:pitchMaxAngle;
 
-orWaypoints = [0 pi/8 -pi/8];
+orWaypoints = [0 pi/8];
 numWaypoints = length(orWaypoints);
 % Initialize orientation of each axis
 orientations = zeros(3,numWaypoints);
@@ -79,7 +79,7 @@ orientations(3,:) = orWaypoints;
 waypoints = repmat(toolPositionHome',1,numWaypoints); 
            
 % Array of waypoint times
-duration = 10; % Define total duration of the movement (s)
+duration = 5; % Define total duration of the movement (s)
 %timeStep = duration/(numWaypoints-1);
 %waypointTimes = 0:timeStep:duration;
 waypointTimes = linspace(0,duration,numWaypoints);
@@ -187,26 +187,26 @@ end
 
 
 %% Replay trajectory
-% 
-% % Create figure and hold it
-% figure
-% set(gcf,'Visible','on');
-% show(gen3, jointAnglesHome');
-% xlim([-1 1]), ylim([-1 1]), zlim([0 1.2])
-% hold on
-%  % Loop through values at specified interval and update figure
-%  count=1;
-%  for i = 1:length(trajTimes)
-%     poseEE = getTransform(gen3,jointAnglesIK(i,:),eeName);
-%     plotTransforms(tform2trvec(poseEE),tform2quat(poseEE),'FrameSize',0.05);
-%    % Display manipulator model
-%    show(gen3, jointAnglesIK(i,:), 'Frames', 'off', 'PreservePlot', false);
-%    title(['Trajectory at t = ' num2str(trajTimes(i))]);
-%    % Update figure
-%    drawnow
-%    frames(count)=getframe(gcf); %store frames for a video
-%    count = count + 1;
-%  end
+
+% Create figure and hold it
+figure
+set(gcf,'Visible','on');
+show(gen3, jointAnglesHome');
+xlim([-1 1]), ylim([-1 1]), zlim([0 1.2])
+hold on
+ % Loop through values at specified interval and update figure
+ count=1;
+ for i = 1:length(trajTimes)
+    poseEE = getTransform(gen3,jointAnglesIK(i,:),eeName);
+    plotTransforms(tform2trvec(poseEE),tform2quat(poseEE),'FrameSize',0.05);
+   % Display manipulator model
+   show(gen3, jointAnglesIK(i,:), 'Frames', 'off', 'PreservePlot', false);
+   title(['Trajectory at t = ' num2str(trajTimes(i))]);
+   % Update figure
+   drawnow
+   frames(count)=getframe(gcf); %store frames for a video
+   count = count + 1;
+ end
 
  %%
  
