@@ -1,0 +1,4 @@
+Calibration can be run with:
+
+kalibr_calibrate_imu_camera --target april_6x6.yaml --cam camchain.yaml --imu imu_adis16448.yaml --bag dynamic.bag --bag-from-to 5 45
+
