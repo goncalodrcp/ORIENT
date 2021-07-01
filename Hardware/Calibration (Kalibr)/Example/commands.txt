@@ -11,7 +11,7 @@ or
 // Set the frame rate to ~4Hz
  rosrun image_view image_view image:=/camera/image_raw
  //Record ROSBAG
-rosbag record /camera/image_raw -O static.bag
+rosbag record /camera/image_raw -O /Bagfiles/static.bag
 //Run Kalibr python script
 ../kalibr_calibrate_cameras --models pinhole-radtan --topics /camera/image_raw --bag static.bag --target april_6x7.yaml
 
@@ -20,6 +20,6 @@ rosbag record /camera/image_raw -O static.bag
 //Set the frame rate to ~10Hz and the IMU rate to ~100Hz
 rosrun image_view image_view image:=/camera/image_raw
 //Record ROSBAG
-rosbag record /camera/image_raw /imu -O dynamic.bag
+rosbag record /camera/image_raw /imu -O /Bagfiles/dynamic.bag
 //Run Kalibr python script
 ../kalibr_calibrate_imu_camera --cam camchain-static.yaml --target april_6x7.yaml --imu imu_LPMS_CU.yaml --bag dynamic.bag
