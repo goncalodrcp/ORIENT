@@ -8,11 +8,11 @@ clc
 clear;
 close all;
 
-addpath('../Utilities')
+addpath('../utilities')
 
-%Load 3D Model of the robot with custom gripper
-loadSTL;
-
+%Original files from MATLAB blog post
+load gen3
+gen3.Gravity = [0 0 -9.81];
 %load gen3positions %1st configuration 
 load robotConfig2 %2nd configuration
 %TO DO: verify these configurations 
@@ -57,7 +57,7 @@ yawAngles = 0:stepYaw:yawMaxAngle;
 rollAngles = 0:stepRoll:rollMaxAngle;
 pitchAngles = 0:stepPitch:pitchMaxAngle;
 
-orWaypoints = [0 pi/8];
+orWaypoints = [0 pi/8 0 -pi/8 -pi/4];
 numWaypoints = length(orWaypoints);
 % Initialize orientation of each axis
 orientations = zeros(3,numWaypoints);
@@ -79,10 +79,11 @@ orientations(3,:) = orWaypoints;
 waypoints = repmat(toolPositionHome',1,numWaypoints); 
            
 % Array of waypoint times
-duration = 5; % Define total duration of the movement (s)
+duration = 8; % Define total duration of the movement (s)
 %timeStep = duration/(numWaypoints-1);
 %waypointTimes = 0:timeStep:duration;
-waypointTimes = linspace(0,duration,numWaypoints);
+%waypointTimes = linspace(0,duration,numWaypoints);
+waypointTimes = [0 2 4 6 8];
 % Trajectory sample time
 ts = 0.05; % Sampling time of the robot is 1ms
 trajTimes = 0:ts:waypointTimes(end);
@@ -216,13 +217,24 @@ hold on
 
 %% Recompute trajectory for each joint
 %close all;
-%Joint angles home? or first guess from IK?
-jointWaypoints = [jointAnglesIK(1,:)' jointAnglesIK(end,:)'];
+%Joint angles home? or first guess from IK
+jointWaypoints = [];
+for i=1:length(waypointTimes)
+    jointWaypoint = jointAnglesIK(trajTimes == waypointTimes(i),:);
+    jointWaypoints = [jointWaypoints jointWaypoint'];
+end
 
-[qJoint,qdJoint,qddJoint] = trapveltraj(jointWaypoints,numel(trajTimes), ... 
-                    'AccelTime',repmat(waypointAccelTimes,[numJoints 1]), ... 
+%jointWaypoints = [jointAnglesIK(1,:)' jointAnglesIK(end,:)'];
+sampleTime = 0.001;
+numSamples = waypointTimes(end)/sampleTime + 1; 
+[qJoint,qdJoint,qddJoint] = trapveltraj(jointWaypoints,numSamples, ... 
                     'EndTime',repmat(diff(waypointTimes),[numJoints 1]));
-                                             
+                
+%[qJoint,qdJoint,qddJoint] = trapveltraj(jointWaypoints,numel(trajTimes), ... 
+%                    'AccelTime',repmat(waypointAccelTimes,[numJoints 1]), ... 
+%                    'EndTime',repmat(diff(waypointTimes),[numJoints 1]));
+
+trajTimes = linspace(0,waypointTimes(end),numSamples);                                             
 eeTform = cell(1,numel(trajTimes));
 for i=1:numel(trajTimes)
      eeTform{i} = getTransform(gen3,qJoint(:,i)',eeName);
@@ -265,24 +277,24 @@ end
 
 %% Replay recomputed trajectory
 
-% % Create figure and hold it
-% figure
-% set(gcf,'Visible','on');
-% show(gen3, jointAnglesHome');
-% xlim([-1 1]), ylim([-1 1]), zlim([0 1.2])
-% hold on
-%  % Loop through values at specified interval and update figure
-%  count=1;
-%  for i = 1:10:length(trajTimes)
-%    plotTransforms(tform2trvec(eeTform{i}),tform2quat(eeTform{i}),'FrameSize',0.05);
-%    % Display manipulator model
-%    show(gen3, qJoint(:,i)', 'Frames', 'off', 'PreservePlot', false);
-%    title(['Trajectory at t = ' num2str(trajTimes(i))]);
-%    % Update figure
-%    drawnow
-%    frames(count)=getframe(gcf); %store frames for a video
-%    count = count + 1;
-%  end
+% Create figure and hold it
+figure
+set(gcf,'Visible','on');
+show(gen3, jointAnglesHome');
+xlim([-1 1]), ylim([-1 1]), zlim([0 1.2])
+hold on
+ % Loop through values at specified interval and update figure
+ count=1;
+ for i = 1:10:length(trajTimes)
+   plotTransforms(tform2trvec(eeTform{i}),tform2quat(eeTform{i}),'FrameSize',0.05);
+   % Display manipulator model
+   show(gen3, qJoint(:,i)', 'Frames', 'off', 'PreservePlot', false);
+   title(['Trajectory at t = ' num2str(trajTimes(i))]);
+   % Update figure
+   drawnow
+   frames(count)=getframe(gcf); %store frames for a video
+   count = count + 1;
+ end
 
 
                 
