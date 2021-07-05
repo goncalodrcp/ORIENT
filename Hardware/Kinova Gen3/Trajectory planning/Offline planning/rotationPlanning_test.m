@@ -17,6 +17,10 @@ gen3.Gravity = [0 0 -9.81];
 load robotConfig2 %2nd configuration
 %TO DO: verify these configurations 
 
+%Joint limits (speed and acceleration) - Check datasheet for more info
+jointSpeedLimit = 50*(pi/180); %rad/s
+jointAccLimit = 57.3*(pi/180); %rad/s^2
+
 %Load the gripper information
 eeName = 'Gripper';
 numJoints = numel(gen3.homeConfiguration);
@@ -167,6 +171,7 @@ for idx=1:numJoints
      %Velocity plot
      figure(velPlot), hold on;
      plot(timesIK,angularVelIK(:,idx));
+     yline(jointSpeedLimit,'r','Max. Speed'); %Speed limit
      for wIdx = 1:numWaypoints
         xline(waypointTimes(wIdx),'k--'); 
      end
@@ -177,6 +182,7 @@ for idx=1:numJoints
      % Acceleration plot
      figure(accPlot), hold on;
      plot(timesIK,angularAccIK(:,idx));
+     yline(jointAccLimit,'r','Max. Acceleration'); %Acceleration limit
      for wIdx = 1:numWaypoints
         xline(waypointTimes(wIdx),'k--'); 
      end
@@ -256,6 +262,7 @@ for idx = 1:numJoints
     figure, hold on
     plot(timesIK,angularVelIK(:,idx));
     plot(trajTimes,qdJoint(idx,:));
+    yline(jointSpeedLimit,'r','Max. Speed')
     for wIdx = 1:numWaypoints
        xline(waypointTimes(wIdx),'k--'); 
     end
@@ -266,6 +273,7 @@ for idx = 1:numJoints
     figure, hold on
     plot(timesIK,angularAccIK(:,idx));
     plot(trajTimes,qddJoint(idx,:));
+    yline(jointSpeedLimit,'r','Max. Acceleration')
     for wIdx = 1:numWaypoints
        xline(waypointTimes(wIdx),'k--'); 
     end
