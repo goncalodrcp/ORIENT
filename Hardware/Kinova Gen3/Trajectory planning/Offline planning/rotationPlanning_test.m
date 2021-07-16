@@ -8,11 +8,10 @@ clc
 clear;
 close all;
 
-addpath('../utilities')
+addpath('../Utilities')
 
-%Original files from MATLAB blog post
-load gen3
-gen3.Gravity = [0 0 -9.81];
+%Load 3D Model of the robot with custom gripper
+loadSTL;
 %load gen3positions %1st configuration 
 load robotConfig2 %2nd configuration
 %TO DO: verify these configurations 
@@ -61,11 +60,11 @@ yawAngles = 0:stepYaw:yawMaxAngle;
 rollAngles = 0:stepRoll:rollMaxAngle;
 pitchAngles = 0:stepPitch:pitchMaxAngle;
 
-orWaypoints = [0 pi/8 0 -pi/8 -pi/4];
+orWaypoints = [0 pi/6 -pi/6 pi/6 0];
 numWaypoints = length(orWaypoints);
 % Initialize orientation of each axis
 orientations = zeros(3,numWaypoints);
-orientations(3,:) = orWaypoints;
+orientations(1,:) = orWaypoints;
  
 % orientations(1,:) = result(1,1)*rollAngles;
 % orientations(2,:) = result(1,2)*pitchAngles;
@@ -83,11 +82,11 @@ orientations(3,:) = orWaypoints;
 waypoints = repmat(toolPositionHome',1,numWaypoints); 
            
 % Array of waypoint times
-duration = 8; % Define total duration of the movement (s)
+duration = 16; % Define total duration of the movement (s)
 %timeStep = duration/(numWaypoints-1);
 %waypointTimes = 0:timeStep:duration;
 %waypointTimes = linspace(0,duration,numWaypoints);
-waypointTimes = [0 2 4 6 8];
+waypointTimes = [0 4 8 12 16];
 % Trajectory sample time
 ts = 0.05; % Sampling time of the robot is 1ms
 trajTimes = 0:ts:waypointTimes(end);
@@ -283,26 +282,28 @@ for idx = 1:numJoints
     legend('Inverse Kinematics results','Corrected trajectory (trapezoidal)'); 
 end
 
+save('Results\Experiments_16_07\trajZAxis_16_07_fast.mat','trajTimes','ikInfo','interpInfo');
+
 %% Replay recomputed trajectory
 
-% Create figure and hold it
-figure
-set(gcf,'Visible','on');
-show(gen3, jointAnglesHome');
-xlim([-1 1]), ylim([-1 1]), zlim([0 1.2])
-hold on
- % Loop through values at specified interval and update figure
- count=1;
- for i = 1:10:length(trajTimes)
-   plotTransforms(tform2trvec(eeTform{i}),tform2quat(eeTform{i}),'FrameSize',0.05);
-   % Display manipulator model
-   show(gen3, qJoint(:,i)', 'Frames', 'off', 'PreservePlot', false);
-   title(['Trajectory at t = ' num2str(trajTimes(i))]);
-   % Update figure
-   drawnow
-   frames(count)=getframe(gcf); %store frames for a video
-   count = count + 1;
- end
+% % Create figure and hold it
+% figure
+% set(gcf,'Visible','on');
+% show(gen3, jointAnglesHome');
+% xlim([-1 1]), ylim([-1 1]), zlim([0 1.2])
+% hold on
+%  % Loop through values at specified interval and update figure
+%  count=1;
+%  for i = 1:10:length(trajTimes)
+%    plotTransforms(tform2trvec(eeTform{i}),tform2quat(eeTform{i}),'FrameSize',0.05);
+%    % Display manipulator model
+%    show(gen3, qJoint(:,i)', 'Frames', 'off', 'PreservePlot', false);
+%    title(['Trajectory at t = ' num2str(trajTimes(i))]);
+%    % Update figure
+%    drawnow
+%    frames(count)=getframe(gcf); %store frames for a video
+%    count = count + 1;
+%  end
 
 
                 
