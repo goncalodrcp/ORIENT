@@ -22,16 +22,16 @@ clc
 clear;
 close all;
 
-%load('sequenceTest.mat')
-%ikInfo_low = ikInfo;
+load('trajData_1stRosbagTest.mat')
+%ikInfo = ikInfo_low;
 %load('trajData.mat');
-load('session_15_04_mov3.mat','ikInfo_low','trajTimes')
+%load('trajData_1stRosbagTest.mat','ikInfo','trajTimes')
 
 %Load trajectory at 50ms 
-jointAngles= ikInfo_low.jointAngles;
-jointVel = ikInfo_low.jointVel;
-jointAcc = ikInfo_low.jointAcc;
-t = ikInfo_low.time;
+jointAngles= ikInfo.jointAngles;
+jointVel = ikInfo.jointVel;
+jointAcc = ikInfo.jointAcc;
+t = ikInfo.time;
 dt = t(2)-t(1);
 ts = 0.001;
 
@@ -65,16 +65,16 @@ trajacc = interp1(t,acc,timestamp);
 % https://www.mathworks.com/help/supportpkg/robotmanipulator/ug/connect-to-gen3.html
 
 %Substitute for the real robot IP
-%  IP = '10.0.3.26';
-%  system(['ping ' IP],'-echo');
+  IP = '10.0.3.26';
+  system(['ping ' IP],'-echo');
 
 %% Create API and connect to robot
 
 Simulink.importExternalCTypes(which('kortex_wrapper_data.h'));
 gen3Kinova = kortex();
 gen3Kinova.ip_address = '10.0.3.26';
-gen3Kinova.user = 'admin';
-gen3Kinova.password = 'admin';
+%gen3Kinova.user = 'admin';
+%gen3Kinova.password = 'admin';
 isOk = gen3Kinova.CreateRobotApisWrapper();
 if isOk
    disp('You are connected to the robot!'); 
@@ -168,7 +168,7 @@ for j=1:size(actuatorFb,2)
 end
 
 %Save data for post processing
-save('test4mocap.mat');
+save('testRosbagFeedback_12_07.mat');
 
 %% Disconnect from the robot
 isOk = gen3Kinova.DestroyRobotApisWrapper();
