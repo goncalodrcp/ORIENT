@@ -22,7 +22,17 @@ clc
 clear;
 close all;
 
-load('trajData_1stRosbagTest.mat')
+%%CHANGES 16/07
+load('trajXAxis_16_07_slow.mat');
+load('timeInfo_slow.mat');
+load('path.mat')
+addpath(path);
+% Trajectory sample time
+% ts = 0.05; % Sampling time of the robot is 1ms
+% trajTimes = 0:ts:waypointTimes(end);
+% numJoints = 7;
+%%CHANGES 16/07
+
 %ikInfo = ikInfo_low;
 %load('trajData.mat');
 %load('trajData_1stRosbagTest.mat','ikInfo','trajTimes')
@@ -59,6 +69,19 @@ timestamp = 0:ts:trajTimes(end);
 trajangles = interp1(t,jointAngles,timestamp);
 trajvel = interp1(t,vel,timestamp);
 trajacc = interp1(t,acc,timestamp);
+
+% jointWaypoints = [];
+% for i=1:length(waypointTimes)
+%     jointWaypoint = ikInfo.jointAngles(trajTimes == waypointTimes(i),:);
+%     jointWaypoints = [jointWaypoints jointWaypoint'];
+% end
+% 
+% sampleTime = 0.001;
+% numSamples = waypointTimes(end)/sampleTime + 1; 
+% [trajangles,trajvel,trajacc] = trapveltraj(jointWaypoints,numSamples, ... 
+%                     'EndTime',repmat(diff(waypointTimes),[numJoints 1]));
+%                 
+% timestamp = linspace(0,waypointTimes(end),numSamples); 
 
 
 %% Connection verification
@@ -168,7 +191,7 @@ for j=1:size(actuatorFb,2)
 end
 
 %Save data for post processing
-save('testRosbagFeedback_12_07.mat');
+save('/media/goncalopereira/DATA/EXP_XAXIS_16_07_SLOW.mat');
 
 %% Disconnect from the robot
 isOk = gen3Kinova.DestroyRobotApisWrapper();
