@@ -3,9 +3,10 @@
 clear;
 close all
 
-addpath('D:\IST\ORIENT_repos\Tests\KINOVA Gen3\Experiments_16_07');
+addpath('D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_16_07');
+addpath('helpers');
 
-load gen3
+%load gen3
 eeName = 'Gripper';
 numJoints = 7;
 %Load feedback from MATLAB API
@@ -20,113 +21,13 @@ jointState_Topic = select(bag,'Topic','/my_gen3/joint_states');
 image_Topic = select(bag,'Topic','/camera/image_raw');
 imu_topic = select(bag,'Topic','/imu');
 
-%Read messages published
-%image_msgs = readMessages(image_Topic);
-%image_msgs = timeseries(image_Topic);
-joint_msgs = readMessages(jointState_Topic);
-imu_msgs = readMessages(imu_topic);
-
-numImages = image_Topic.NumMessages; %number of images
-numJointMsg = jointState_Topic.NumMessages; %number of joint state messages
-numIMUMsg = imu_topic.NumMessages; %number of imu messages
-
-%%CAMERA
-%Get all images - Some of them might be discarded later
-for i=1:numImages 
-    image_msg = readMessages(image_Topic,i);
-    image = readImage(image_msg{1});
-    %convert to grayscale
-    image = rgb2gray(image); 
-    images_{i} = im2double(image);
-    %get timestamp
-    t_images(i) = image_msg{1}.Header.Stamp.Sec +10^-9*image_msg{1}.Header.Stamp.Nsec;
-    %figure;
-    %imshow(images_{i});
-end
-%t_images = t_images - t_images(1);
-
-%%KINOVA GEN3
-%Store joint messages
-for i=1:length(joint_msgs)
-    jointTraj(i,:) = joint_msgs{i}.Position(1:numJoints); %Save 7dof joint trajectory
-    velocityTraj(i,:) = joint_msgs{i}.Velocity(1:numJoints); %velocity
-    t_joints(i) = joint_msgs{i}.Header.Stamp.Sec +10^-9*joint_msgs{i}.Header.Stamp.Nsec; %convert time stamp
-end
-%Convert joint states to degrees
-jointTraj = jointTraj*180/pi;
-velocityTraj = velocityTraj*180/pi;
-%t_joints = t_joints - t_joints(1);
-
-%%IMU
-for i=1:numIMUMsg
-    %Collect orientation (in quaternion)
-    orientationData(:,i) = [imu_msgs{i}.Orientation.W; ...
-                            imu_msgs{i}.Orientation.X; ...
-                            imu_msgs{i}.Orientation.Y; ...
-                            imu_msgs{i}.Orientation.Z];
-    %Collect angular velocity (gyroscope)
-    gyroData(:,i) = [imu_msgs{i}.AngularVelocity.X; ...
-                     imu_msgs{i}.AngularVelocity.Y; ...
-                     imu_msgs{i}.AngularVelocity.Z]; 
-    %Collect acceleration (accelerometer)
-    accData(:,i) = [imu_msgs{i}.LinearAcceleration.X; ...
-                     imu_msgs{i}.LinearAcceleration.Y; ...
-                     imu_msgs{i}.LinearAcceleration.Z]; 
-    %get timestamp
-    t_IMU(i) = imu_msgs{i}.Header.Stamp.Sec +10^-9*imu_msgs{i}.Header.Stamp.Nsec; %convert time stamp
-end
-%t_IMU = t_IMU - t_IMU(1);
+%Get ROS messages
+[imageData, imuData, jointData] = helperGetRosMessages(image_Topic,imu_topic,jointState_Topic);
 
 %% PRE-FILTER DATA - DISCARD SAMPLES FROM WHEN THE ROBOT IS NOT MOVING, CORRECT ANGLE OFFSET, ETC
 
-% Filter joint data to discard time instants from when the robot is not moving
- k=1;
- for i=1:size(velocityTraj,1)
-     for j=1:numJoints
-        if(abs(velocityTraj(i,j)) > 0.01) %threshold to discard samples (deg/s)
-            validSamples(k) = i;
-            k = k + 1;
-            break;
-        end 
-     end
- end
- %Update joint state vectors
- t_joints = t_joints(validSamples);
- jointTraj = jointTraj(validSamples,:);
- velocityTraj = velocityTraj(validSamples,:);
- 
- %Filter images and store them
- filteredImages = t_images > t_joints(1) & t_images < t_joints(end);
- j=1;
- for i=1:length(filteredImages)
-     if filteredImages(i)
-        imageData{j} = images_{i}; %filter images
-        j = j + 1;
-     end
- end
- t_images = t_images(filteredImages); %filter images
- 
- %Correct offsets in the angles
- for i=1:size(jointTraj,2)
-     for j=1:size(jointTraj,1)-1
-         if(jointTraj(j+1,i)-jointTraj(j,i) > 340)
-             fprintf('WARNING: Positive discontinuity at joint %d\n',i);
-             jointTraj(:,i) = wrapTo360(jointTraj(:,i));
-             break;
-         elseif(jointTraj(j+1,i)-jointTraj(j,i) < -340)
-             fprintf('WARNING: Negative discontinuity at joint %d\n',i);
-             jointTraj(:,i) = wrapTo360(jointTraj(:,i));
-             break;
-         end
-     end
- end
-
-%Filter IMU messages
-filteredIMU = t_IMU > t_joints(1) & t_IMU < t_joints(end);
-orientationData = orientationData(:,filteredIMU);
-gyroData = gyroData(:,filteredIMU);
-accData = accData(:,filteredIMU);
-t_IMU = t_IMU(filteredIMU); %filter images
+%Pre filter data
+[imageDataFilt,imuDataFilt,jointDataFilt] = helperPreFilterData(imageData,imuData,jointData);
 
 %% ALIGN TIME VECTORS
 
