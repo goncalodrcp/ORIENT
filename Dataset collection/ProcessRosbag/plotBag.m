@@ -31,14 +31,30 @@ imu_topic = select(bag,'Topic','/imu');
 
 %% ALIGN TIME VECTORS
 
+jointTraj = jointDataFilt.angles;
+velocityTraj = jointDataFilt.velocity;
+t_joints = jointDataFilt.timestamp;
+
+t_IMU = imuDataFilt.timestamp;
+
+t_images = imageDataFilt.timestamp;
+
+
 % Concatenate vectors and then sort them in ascending order by timestamp
-%t_new = sort([t_joints t_IMU t_images]);
+t_new = sort([t_joints t_IMU t_images]);
 % Create logic vector that maps the sampling times of each sensor
-%occurrencesIMU = ismembertol(t_new,t_IMU);
-%occurrencesImages = ismembertol(t_new,t_images);
-%occurrencesJointAngles = ismembertol(t_new,t_joints);
+occurrencesIMU = ismembertol(t_new,t_IMU,eps);
+occurrencesImages = ismembertol(t_new,t_images,eps);
+occurrencesJointAngles = ismembertol(t_new,t_joints,eps);
+
+t_IMU_new = t_new(occurrencesIMU);
+t_joints_new = t_new(occurrencesJointAngles);
+t_images_new = t_new(occurrencesImages);
+
 % Correct offset to start at t=0
-%t_new = t_new - t_new(1); %is this okay?
+t_new = t_new - t_new(1); %is this okay?
+
+%%
 
 [flag,t_sorted,occurrences] = sortVectors(t_IMU,t_joints,t_images);
 if(~flag)
@@ -54,7 +70,8 @@ end
          end
          figure(j);
          subplot(2,2,1);
-         plot(t_joints-t_joints(1),jointTraj(:,j)); 
+         plot(t_joints-t_joints(1),jointTraj(:,j)); hold on;
+         plot(timestamp,trajangles(:,j),'-.','Linewidth',1);
          title(sprintf('Joint %d - Angle (feedback)',j))
          subplot(2,2,2);
          plot(timestamp,trajangles(:,j));
