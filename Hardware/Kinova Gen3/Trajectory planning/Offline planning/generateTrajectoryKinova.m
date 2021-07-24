@@ -24,16 +24,16 @@ jointAccLimit = 57.3*(pi/180); %rad/s^2
 eeName = 'Gripper';
 numJoints = numel(gen3.homeConfiguration);
 
-figure;
-show(gen3,jointAnglesHome');
-T_home = getTransform(gen3,jointAnglesHome',eeName); %Get transformation matrix from base to gripper in home configuration
+% figure;
+% show(gen3,jointAnglesHome');
+% T_home = getTransform(gen3,jointAnglesHome',eeName); %Get transformation matrix from base to gripper in home configuration
 
 %% Define waypoints
 
 %Define rotation waypoints
 axis = 'Y';
 waypoints = [0 pi/6 -pi/6 0 pi/5];
-waypointTimes = [0 4 8 12 16 20];
+waypointTimes = [0 4 8 12 16];
 ts = 0.05; %Sampling time (s)
 numWaypoints = length(waypoints);
 [waypointTrajectory] = defineWaypoints(waypoints,axis,toolPositionHome',waypointTimes,ts);
@@ -65,10 +65,27 @@ ikInitGuess(ikInitGuess < -pi) = ikInitGuess(ikInitGuess < -pi) + 2*pi;
                                    toolPositionHome,waypointTimes,ts,eeName,ik,ikWeights,ikInitGuess);
                                                               
 %Retrieve information
-jointAnglesIK = ikInfo.jointAngles;
-timesIK = ikInfo.time;
 rot = interpInfo.Rot;
 angv = interpInfo.AngVel;
 angacc = interpInfo.AngAcc;
+trajTimes = waypointTrajectory.trajtimes;
 
 disp(['Trajectory generation time : ' num2str(trajGenTime) ' s']);
+
+%% Plot trajectory - Interpolation 
+
+% Get rotational trajectory in euler angles
+eulerAngles = quat2eul(rot(:,1:size(rot,2))');
+
+% Plot trajectories generated from quaternion interpolation
+plotInterpolation(trajTimes,waypointTimes,eulerAngles,angv,angacc);
+
+
+%% Plot trajectory - IK
+
+% Plot joint trajectory from Inverse Kinematics
+helperPlotIK(ikInfo,ts,waypointTimes,jointSpeedLimit,jointAccLimit)
+
+%% Recompute trajectory for each joint
+
+trajectoryToSend = compute1kHzTrajectory(ikInfo,waypointTimes,trajTimes);
