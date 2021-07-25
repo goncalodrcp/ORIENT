@@ -31,8 +31,8 @@ numJoints = numel(gen3.homeConfiguration);
 %% Define waypoints
 
 %Define rotation waypoints
-axis = 'Y';
-waypoints = [0 pi/6 -pi/6 0 pi/5];
+axis = 'X';
+waypoints = [0 pi/6 -pi/6 0 pi/6];
 waypointTimes = [0 4 8 12 16];
 ts = 0.05; %Sampling time (s)
 numWaypoints = length(waypoints);
@@ -89,3 +89,15 @@ helperPlotIK(ikInfo,ts,waypointTimes,jointSpeedLimit,jointAccLimit)
 %% Recompute trajectory for each joint
 
 trajectoryToSend = compute1kHzTrajectory(ikInfo,waypointTimes,trajTimes);
+
+
+%% Save trajectory
+
+path = '/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Sent';
+
+fileName = '/XAXIS_1.mat';
+
+savefile = strcat(path,fileName);
+
+save(savefile,'trajectoryToSend','trajTimes','ikInfo','interpInfo');
+

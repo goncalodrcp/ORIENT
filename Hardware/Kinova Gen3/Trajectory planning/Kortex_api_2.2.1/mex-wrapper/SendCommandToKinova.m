@@ -22,11 +22,26 @@ clc
 clear;
 close all;
 
+%%
+
+%%TEST 24/07
+path = '/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Sent';
+file = '/YAXIS_1.mat';
+fileLoad = strcat(path,file);
+load(fileLoad);
+
+%Choose file name to save later
+pathSave = '/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Feedback';
+fileToSave = '/XAXIS_1_Feedback_Mixed.mat';
+fileSave = strcat(pathSave,fileToSave);
+
+%%TEST 24/07
+
 %%CHANGES 16/07
-load('trajXAxis_16_07_slow.mat');
-load('timeInfo_slow.mat');
-load('path.mat')
-addpath(path);
+%load('trajXAxis_16_07_slow.mat');
+%load('timeInfo_slow.mat');
+%load('path.mat')
+%addpath(path);
 % Trajectory sample time
 % ts = 0.05; % Sampling time of the robot is 1ms
 % trajTimes = 0:ts:waypointTimes(end);
@@ -134,7 +149,10 @@ end
 %% Send starting point to robot
 
 
-jointCmd = wrapTo360(trajangles(1,:));
+startingPoint = trajectoryToSend.angles(:,1)'*180/pi;
+
+%jointCmd = wrapTo360(trajangles(1,:));
+jointCmd = wrapTo360(startingPoint);
 constraintType = int32(0);
 speed = 0;
 duration = 0;
@@ -151,7 +169,7 @@ end
 while 1
     [isOk,~, actuatorFb, ~] = gen3Kinova.SendRefreshFeedback();
     if isOk
-        if max(abs(wrapTo360(trajangles(1,:))-actuatorFb.position)) < 0.2
+        if max(abs(wrapTo360(startingPoint)-actuatorFb.position)) < 0.2
             disp('Starting point reached.')
             break;
         end 
@@ -162,7 +180,13 @@ end
 
 %% Send pre computed trajectory
 
-isOk = gen3Kinova.SendPreComputedTrajectory(trajangles.', trajvel.', trajacc.', timestamp, size(timestamp,2));
+angleTraj = trajectoryToSend.angles'*180/pi;
+velTraj = trajectoryToSend.velocity'*180/pi;
+accTraj = trajectoryToSend.acceleration'*180/pi;
+timestamp = trajectoryToSend.time;
+
+%isOk = gen3Kinova.SendPreComputedTrajectory(trajangles.', trajvel.', trajacc.', timestamp, size(timestamp,2));
+isOk = gen3Kinova.SendPreComputedTrajectory(angleTraj.', velTraj.', accTraj.', timestamp, size(timestamp,2));
 if isOk
     disp('SendPreComputedTrajectory success');
 else
@@ -174,7 +198,7 @@ i=1;
 while 1
     [isOk,~, actuatorFb(i), ~] = gen3Kinova.SendRefreshFeedback();
     if isOk
-        if max(abs(wrapTo360(trajangles(end,:))-actuatorFb(i).position)) < 0.2
+        if max(abs(wrapTo360(angleTraj(end,:))-actuatorFb(i).position)) < 0.2
             disp('End Point reached.')
             break;
         end 
@@ -191,7 +215,7 @@ for j=1:size(actuatorFb,2)
 end
 
 %Save data for post processing
-save('/media/goncalopereira/DATA/EXP_XAXIS_16_07_SLOW.mat');
+%save(fileSave);
 
 %% Disconnect from the robot
 isOk = gen3Kinova.DestroyRobotApisWrapper();

@@ -3,16 +3,18 @@
 clear;
 close all
 
-addpath('D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_16_07');
+%addpath('D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_16_07');
+%addpath('/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Feedback');
+addpath('/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Feedback/José');
 addpath('helpers');
 
 %load gen3
 eeName = 'Gripper';
 numJoints = 7;
 %Load feedback from MATLAB API
-load('EXP_ZAXIS_16_07_SLOW_1.mat')
+%load('ZAXIS_1_Feedback.mat')
 %Load rosbag
-bag = rosbag('EXP_ZAXIS_SLOW_16_07_1.bag');
+bag = rosbag('24_07_ZAXIS_1_Events.bag');
 
 %% READ MESSAGES FROM ROSBAG
 
@@ -22,7 +24,15 @@ image_Topic = select(bag,'Topic','/camera/image_raw');
 imu_topic = select(bag,'Topic','/imu');
 
 %Get ROS messages
-[imageData, imuData, jointData] = helperGetRosMessages(image_Topic,imu_topic,jointState_Topic);
+%[imageData, imuData, jointData] = helperGetRosMessages(image_Topic,imu_topic,jointState_Topic);
+joint_msgs = readMessages(jointState_Topic);
+numJointMsg = jointState_Topic.NumMessages; %number of joint state messages
+for i=1:numJointMsg
+    jointTraj(i,:) = joint_msgs{i}.Position(1:numJoints); %Save 7dof joint trajectory
+    velocityTraj(i,:) = joint_msgs{i}.Velocity(1:numJoints); %velocity
+    t_joints(i) = joint_msgs{i}.Header.Stamp.Sec +10^-9*joint_msgs{i}.Header.Stamp.Nsec; %convert time stamp
+end
+
 
 %% PRE-FILTER DATA - DISCARD SAMPLES FROM WHEN THE ROBOT IS NOT MOVING, CORRECT ANGLE OFFSET, ETC
 
