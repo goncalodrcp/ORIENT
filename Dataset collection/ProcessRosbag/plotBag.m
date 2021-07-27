@@ -1,20 +1,21 @@
-%% Process Kinova results (16/07/2021)
+%% Process Kinova results (24/07/2021)
 
 clear;
 close all
 
 %addpath('D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_16_07');
 %addpath('/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Feedback');
-addpath('/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Feedback/José');
+%addpath('/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Feedback/José');
+addpath('D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_24_07\Feedback\Gonçalo');
 addpath('helpers');
 
-%load gen3
+loadSTL;
 eeName = 'Gripper';
 numJoints = 7;
 %Load feedback from MATLAB API
-%load('ZAXIS_1_Feedback.mat')
+load('ZAXIS_1_Feedback.mat')
 %Load rosbag
-bag = rosbag('24_07_ZAXIS_1_Events.bag');
+bag = rosbag('24_07_ZAXIS_1.bag');
 
 %% READ MESSAGES FROM ROSBAG
 
@@ -24,14 +25,7 @@ image_Topic = select(bag,'Topic','/camera/image_raw');
 imu_topic = select(bag,'Topic','/imu');
 
 %Get ROS messages
-%[imageData, imuData, jointData] = helperGetRosMessages(image_Topic,imu_topic,jointState_Topic);
-joint_msgs = readMessages(jointState_Topic);
-numJointMsg = jointState_Topic.NumMessages; %number of joint state messages
-for i=1:numJointMsg
-    jointTraj(i,:) = joint_msgs{i}.Position(1:numJoints); %Save 7dof joint trajectory
-    velocityTraj(i,:) = joint_msgs{i}.Velocity(1:numJoints); %velocity
-    t_joints(i) = joint_msgs{i}.Header.Stamp.Sec +10^-9*joint_msgs{i}.Header.Stamp.Nsec; %convert time stamp
-end
+[imageData, imuData, jointData] = helperGetRosMessages(image_Topic,imu_topic,jointState_Topic);
 
 
 %% PRE-FILTER DATA - DISCARD SAMPLES FROM WHEN THE ROBOT IS NOT MOVING, CORRECT ANGLE OFFSET, ETC
@@ -71,6 +65,20 @@ if(~flag)
    disp('Something went wrong when aligning the vectors'); 
 end
 
+%% SAVE DATA FOR THE FILTER
+
+path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_24_07\Feedback\Gonçalo\';
+fileName = 'ZAXIS_1_filter_part1.mat';
+savefile = strcat(path,fileName);
+
+save(savefile,'imageData','imuData','jointData','-v7.3');
+
+fileName = 'ZAXIS_1_filter_part2.mat';
+savefile = strcat(path,fileName);
+
+save(savefile,'gen3','imageDataFilt','imuDataFilt','jointDataFilt', ...
+     't_sorted','occurrences','trajectoryToSend','ikInfo','interpInfo','trajTimes');
+
  
 %% PLOT JOINT ANGLES - SENT AND FEEDBACK FROM THE ACTUATORS
  
@@ -81,16 +89,16 @@ end
          figure(j);
          subplot(2,2,1);
          plot(t_joints-t_joints(1),jointTraj(:,j)); hold on;
-         plot(timestamp,trajangles(:,j),'-.','Linewidth',1);
+         plot(timestamp,angleTraj(:,j),'-.','Linewidth',1);
          title(sprintf('Joint %d - Angle (feedback)',j))
          subplot(2,2,2);
-         plot(timestamp,trajangles(:,j));
+         plot(timestamp,angleTraj(:,j));
          title(sprintf('Joint %d - Angle (Sent)',j))
          subplot(2,2,3);
          plot(t_joints-t_joints(1),velocityTraj(:,j));
          title(sprintf('Joint %d - Angular velocity (feedback)',j))
          subplot(2,2,4);
-         plot(timestamp,trajvel(:,j)); 
+         plot(timestamp,velTraj(:,j)); 
          title(sprintf('Joint %d - Angular velocity (Sent)',j))
  end
  
@@ -196,8 +204,8 @@ title('qZ');
 
 %Trajectory planning, expected orientation
 %Sent to the kinova
-for i=1:length(trajangles)
-   transform(:,:,i) = getTransform(gen3,trajangles(i,:)*pi/180,eeName); 
+for i=1:length(angleTraj)
+   transform(:,:,i) = getTransform(gen3,angleTraj(i,:)*pi/180,eeName); 
    eePos(:,i) = tform2trvec(transform(:,:,i)); %XYZ position of the end-effector
    eeOrientation(:,i) = tform2eul(transform(:,:,i))*180/pi; %Orientation in Euler angles ZYX
    eeQuat(:,i) = tform2quat(transform(:,:,i));
