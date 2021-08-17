@@ -67,17 +67,17 @@ end
 
 %% SAVE DATA FOR THE FILTER
 
-path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_24_07\Feedback\Gonçalo\';
-fileName = 'ZAXIS_1_filter_part1.mat';
-savefile = strcat(path,fileName);
-
-save(savefile,'imageData','imuData','jointData','-v7.3');
-
-fileName = 'ZAXIS_1_filter_part2.mat';
-savefile = strcat(path,fileName);
-
-save(savefile,'gen3','imageDataFilt','imuDataFilt','jointDataFilt', ...
-     't_sorted','occurrences','trajectoryToSend','ikInfo','interpInfo','trajTimes');
+% path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_24_07\Feedback\Gonçalo\';
+% fileName = 'ZAXIS_1_filter_part1.mat';
+% savefile = strcat(path,fileName);
+% 
+% save(savefile,'imageData','imuData','jointData','-v7.3');
+% 
+% fileName = 'ZAXIS_1_filter_part2.mat';
+% savefile = strcat(path,fileName);
+% 
+% save(savefile,'gen3','imageDataFilt','imuDataFilt','jointDataFilt', ...
+%      't_sorted','occurrences','trajectoryToSend','ikInfo','interpInfo','trajTimes');
 
  
 %% PLOT JOINT ANGLES - SENT AND FEEDBACK FROM THE ACTUATORS
@@ -140,6 +140,10 @@ title('qZ');
 
  
 %% PLOT IMU DATA
+
+accData = imuDataFilt.accelerometer;
+gyroData = imuDataFilt.gyroscope;
+orientationData = imuDataFilt.orientation;
 
 % Acceleration
 figure;
