@@ -114,7 +114,7 @@ end
 
 %% Replay trajectory in kinova
 
-replayTrajectoryKinova(gen3,sentTraj);
+%replayTrajectoryKinova(gen3,sentTraj);
 
 %%
 % Create figure and hold it

@@ -1,0 +1,45 @@
+Commands to use OptiTrack
+
+Useful links:
+    - https://tuw-cpsg.github.io/tutorials/optitrack-and-ros/
+    - http://wiki.ros.org/mocap_optitrack
+    - http://wiki.ros.org/vrpn_client_ros
+    - https://barelywalking.com/?p=440
+
+VRPN
+    1.
+    source /opt/ros/kinetic/setup.bash
+    mkdir vrpn_test
+    cd vrpn_test
+    mkdir src
+    catkin_make
+    cd src
+    git clone https://github.com/ros-drivers/vrpn_client_ros
+    cd ..
+    catkin_make_isolated -DCMAKE_INSTALL_PREFIX=/opt/ros/kinetic -DLIB_SUFFIX="64" -DCMAKE_BUILD_TYPE=Release --install
+
+    2.
+    source /opt/ros/kinetic/setup.bash
+    roslaunch vrpn_client_ros sample.launch server:=192.168.1.241
+
+    3.
+    source /opt/ros/kinetic/setup.bash
+    rostopic echo /vrpn_client_node/RigidBody1/pose
+
+MOCAP
+    1.
+    source /opt/ros/kinetic/setup.bash
+    mkdir mocap
+    cd mocap
+    mkdir src
+    catkin_make
+    cd src
+    git clone https://github.com/ros-drivers/mocap_optitrack
+    cd ..
+
+    2.
+    roslaunch mocap_optitrack mocap.launch
+
+    3.
+    rostopic list
+    rostopic echo /Robot_1/pose
