@@ -61,10 +61,7 @@ velocityTraj = feedbackTraj.velocity;
 t_joints = feedbackTraj.timestamp;
 
  for j=1:numJoints
-         if(j==1)
-             jointPlot(1:numJoints) = figure;
-         end
-         figure(j);
+         figure;
          subplot(2,2,1);
          plot(t_joints-t_joints(1),jointTraj(:,j)); hold on;
          plot(timestamp,angleTraj(:,j),'-.','Linewidth',1);
