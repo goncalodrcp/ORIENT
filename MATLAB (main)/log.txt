@@ -1,0 +1,5 @@
+Notes:
+
+	- Last working versions of the filter software
+		Kinova - 29/09/2021
+		Event simulator - 29/09/2021
