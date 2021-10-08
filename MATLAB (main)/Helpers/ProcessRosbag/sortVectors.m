@@ -1,4 +1,4 @@
-function [flag,t_sorted,occurrences] = sortVectors(t,t1,t2)
+function [flag,t_sorted,t_new,t1_new,t2_new,occurrences] = sortVectors(t,t1,t2)
 
 % Concatenate vectors and then sort them in ascending order by timestamp
 t_sorted = sort([t t1 t2]);
@@ -6,7 +6,7 @@ t_sorted = sort([t t1 t2]);
 occurrences_t = ismembertol(t_sorted,t,eps); % added eps tolerance
 occurrences_t1 = ismembertol(t_sorted,t1,eps);
 occurrences_t2 = ismembertol(t_sorted,t2,eps);
-%Filter
+%Filter (new time vectors)
 t_new = t_sorted(occurrences_t);
 t1_new = t_sorted(occurrences_t1);
 t2_new = t_sorted(occurrences_t2);
@@ -18,7 +18,6 @@ end
 
 % Concatenate occurrences
 occurrences = [occurrences_t; occurrences_t1; occurrences_t2];
-
 % Correct offset to start at t=0
 t_sorted = t_sorted - t_sorted(1); %is this okay?
 
