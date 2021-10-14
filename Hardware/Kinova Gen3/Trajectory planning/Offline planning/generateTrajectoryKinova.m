@@ -9,6 +9,7 @@ clear;
 close all;%
 
 addpath('../Utilities')
+addpath('D:\IST\ORIENT_repos\ORIENT\MATLAB (main)\Helpers\ProcessRosbag');
 
 %Load 3D Model of the robot with custom gripper
 loadSTL;
@@ -31,9 +32,10 @@ numJoints = numel(gen3.homeConfiguration);
 %% Define waypoints
 
 %Define rotation waypoints
-axis = 'X';
-waypoints = [0 pi/6 -pi/6 0 pi/6];
-waypointTimes = [0 4 8 12 16];
+axis = 'Z';
+amplitude = 20; % in degrees
+waypoints = [0 amplitude -amplitude 0 -amplitude amplitude]*pi/180;
+waypointTimes = [0 4 8 12 16 20];
 ts = 0.05; %Sampling time (s)
 numWaypoints = length(waypoints);
 [waypointTrajectory] = defineWaypoints(waypoints,axis,toolPositionHome',waypointTimes,ts);
@@ -60,7 +62,7 @@ ikInitGuess(ikInitGuess < -pi) = ikInitGuess(ikInitGuess < -pi) + 2*pi;
 
 %% Trajectory generation and following loop 
 
-%Perform interpolation and solve IK at 1kHz (1ms)
+%Perform interpolation and solve IK at 50ms
 [interpInfo,ikInfo,trajGenTime] = rotationInterpAndIK(numWaypoints,waypointTrajectory.orientations, ... 
                                    toolPositionHome,waypointTimes,ts,eeName,ik,ikWeights,ikInitGuess);
                                                               
@@ -80,6 +82,8 @@ eulerAngles = quat2eul(rot(:,1:size(rot,2))');
 % Plot trajectories generated from quaternion interpolation
 plotInterpolation(trajTimes,waypointTimes,eulerAngles,angv,angacc);
 
+MaxVelocity = max(max(angv,[],2))*180/pi;
+
 
 %% Plot trajectory - IK
 
@@ -90,12 +94,20 @@ helperPlotIK(ikInfo,ts,waypointTimes,jointSpeedLimit,jointAccLimit)
 
 trajectoryToSend = compute1kHzTrajectory(ikInfo,waypointTimes,trajTimes);
 
+%% Replay trajectory that is going to be sent
+
+trajectoryToSend.angles = trajectoryToSend.angles';
+trajectoryToSend.velocity = trajectoryToSend.velocity';
+trajectoryToSend.acceleration = trajectoryToSend.acceleration';
+replayTrajectoryKinova(gen3,trajectoryToSend);
+plotSentTrajectory(gen3,waypointTimes,trajectoryToSend);
 
 %% Save trajectory
 
-path = '/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Sent';
+%path = '/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Sent';
+path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Sent\Z-Axis';
 
-fileName = '/XAXIS_1.mat';
+fileName = '\Z_A20_v13.mat';
 
 savefile = strcat(path,fileName);
 
