@@ -9,9 +9,9 @@ numJoints = 7;
 eeName = 'Gripper';
 
 %The data structure comes from the function "compute1kHzTrajectory"
-angleTraj = sentTraj.angles'*180/pi;
-velTraj = sentTraj.velocity'*180/pi;
-accTraj = sentTraj.acceleration'*180/pi;
+angleTraj = sentTraj.angles*180/pi;
+velTraj = sentTraj.velocity*180/pi;
+accTraj = sentTraj.acceleration*180/pi;
 timestamp = sentTraj.time;
 
 
