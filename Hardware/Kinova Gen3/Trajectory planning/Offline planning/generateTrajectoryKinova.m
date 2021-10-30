@@ -25,9 +25,9 @@ jointAccLimit = 57.3*(pi/180); %rad/s^2
 eeName = 'Gripper';
 numJoints = numel(gen3.homeConfiguration);
 
-% figure;
-% show(gen3,jointAnglesHome');
-% T_home = getTransform(gen3,jointAnglesHome',eeName); %Get transformation matrix from base to gripper in home configuration
+figure;
+show(gen3,jointAnglesHome');
+T_home = getTransform(gen3,jointAnglesHome',eeName); %Get transformation matrix from base to gripper in home configuration
 
 %% Define waypoints
 
@@ -105,11 +105,11 @@ plotSentTrajectory(gen3,waypointTimes,trajectoryToSend);
 %% Save trajectory
 
 %path = '/media/goncalopereira/DATA/IST/ORIENT_repos/Tests/ThesisSW/Data collected/Experiments_24_07/Sent';
-path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Sent\Z-Axis';
-
-fileName = '\Z_A20_v13.mat';
-
-savefile = strcat(path,fileName);
-
-save(savefile,'trajectoryToSend','trajTimes','ikInfo','interpInfo');
+% path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Sent\Z-Axis';
+% 
+% fileName = '\Z_A20_v13.mat';
+% 
+% savefile = strcat(path,fileName);
+% 
+% save(savefile,'trajectoryToSend','trajTimes','ikInfo','interpInfo');
 
