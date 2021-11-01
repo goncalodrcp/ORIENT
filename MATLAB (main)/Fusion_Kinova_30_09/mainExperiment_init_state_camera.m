@@ -19,10 +19,10 @@ P0 = diag([p0Rot*ones(3,1);p0v*ones(3,1);p0x*ones(3,1);...
 %%
 
 % process noises - this works with im_X_A10_v18 only...
-q_omega = (1.6968e-4)^2*200;
-q_a = (2e-2)^2*200;
-q_omegab = (1.9393e-5)^2*200;
-q_ab = (3e-2)^2*200;
+q_omega = (2e-4)^2*200;
+q_a = (2e-3)^2*200;
+q_omegab = (2e-5)^2*200;
+q_ab = (3e-3)^2*200;
 %this works - sort of
 % q_omega = (0.000060038)^2*200;
 % q_a = (0.000553)^2*200;

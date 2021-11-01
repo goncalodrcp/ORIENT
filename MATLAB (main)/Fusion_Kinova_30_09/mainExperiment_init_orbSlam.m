@@ -4,6 +4,7 @@ num_tracks = 200; %it was 100
 
 orb_slam.omega_b = [0;0;0];
 orb_slam.a_b = [0;0;0];
+% orb_slam.a_b = [-1.70;0.12;0];
 %orb_slam.a_b = [0.007678;-0.007325;0.045866]; %data from LPMS sensor
 
 cameraParams = ParamFilter.cameraParams;
