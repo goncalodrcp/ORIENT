@@ -4,17 +4,17 @@ close all;
 %% Import data
 
 %add path to ESim test
-path_to_sw = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\';
+path_to_sw = 'D:\IST\ORIENT_repos\ORIENT\MATLAB (main)\Fusion_ESim_29_09_2021\';
 addpath(genpath(path_to_sw));
 
-%path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\Results\rotZ\';
+path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\Results\rotZ\';
 %path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\Results\rotY\'; %rotation on Y - yes thats correct
-path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\Results\rotX\'; %rotation on X - yes thats correct
+%path = 'D:\IST\ORIENT_repos\ORIENT\MATLAB (main)\Fusion_ESim_29_09_2021\Results\rotX\'; %rotation on X - yes thats correct
 addpath(path);
 
-%load('rotZ_18_results.mat');
+load('rotZ_18_results.mat');
 %load('rotX_18_results.mat'); %rotation on Y - yes thats correct
-load('rotY_18_results.mat'); %rotation on X - yes thats correct
+%load('rotY_18_results.mat'); %rotation on X - yes thats correct
 
 %note:the order of rotation is ZYX(1,2,3) or(psi,theta,phi), however, there's an offset
 %rotation noticeable in the image frames and so the Y rotation is 3-theta
@@ -87,27 +87,30 @@ sgtitle('Orientation Euler angles')
 subplot(3,1,1); 
 plot(t,trajSE3.psi); hold on;
 title('Z-Axis'); 
-plot(t,trajSO3.psi);
+%plot(t,trajSO3.psi);
 plot(tGT,trajGT.psi);
-legend('SE(3)','SO(3)','Ground-truth');
+legend('Estimated','Ground-truth');
+%legend('SE(3)','SO(3)','Ground-truth');
 xlabel('t(s)');
 ylabel('Angle (º)');
 
 subplot(3,1,2); 
 plot(t,trajSE3.phi); hold on;
 title('Y-Axis');
-plot(t,trajSO3.phi);
+%plot(t,trajSO3.phi);
 plot(tGT,trajGT.phi); 
-legend('SE(3)','SO(3)','Ground-truth');
+legend('Estimated','Ground-truth');
+%legend('SE(3)','SO(3)','Ground-truth');
 xlabel('t(s)');
 ylabel('Angle (º)');
 
 subplot(3,1,3); 
 plot(t,trajSE3.theta); hold on;
 title('X-Axis');
-plot(t,trajSO3.theta);
+%plot(t,trajSO3.theta);
 plot(tGT,trajGT.theta); 
-legend('SE(3)','SO(3)','Ground-truth');
+legend('Estimated','Ground-truth');
+%legend('SE(3)','SO(3)','Ground-truth');
 xlabel('t(s)');
 ylabel('Angle (º)');
 
