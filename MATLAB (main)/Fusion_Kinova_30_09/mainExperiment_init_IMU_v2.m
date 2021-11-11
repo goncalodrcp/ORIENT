@@ -42,16 +42,16 @@ tIMU = t;
 
 %% Pre filter IMU data with median filter;
 % % 
-% medFilt = dsp.MedianFilter(15); %window size
-% filtOmega = medFilt(omega');
-% omega = filtOmega';
-% filtAcc = medFilt(acc');
-% acc = filtAcc';
+medFilt = dsp.MedianFilter(15); %window size
+filtOmega = medFilt(omega');
+omega = filtOmega';
+filtAcc = medFilt(acc');
+acc = filtAcc';
 
 %%
-
-% acc(1,:) = -acc(1,:);
-% acc(2,:) = -acc(2,:);
+% % 
+acc(1,:) = -acc(1,:);
+acc(2,:) = -acc(2,:);
 
 %%
 
