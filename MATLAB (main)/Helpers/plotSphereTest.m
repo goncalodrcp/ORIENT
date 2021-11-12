@@ -77,6 +77,6 @@ plot3(endPoint(1),endPoint(2),1,'.','Color','#0072BD','MarkerSize',10);
 %text(endPoint(1),endPoint(2),1.2,'$\frak{g}$','interpreter','latex','FontSize',14,'FontWeight','bold');
 text(-0.8,0.8,1.2,'$T_{g}\mathcal{G}$','interpreter','latex','FontSize',14,'FontWeight','bold');
 set(gca,'visible','off')
-print(gcf,'foo.png','-dpng','-r300');
+%print(gcf,'foo.png','-dpng','-r300');
 
 
