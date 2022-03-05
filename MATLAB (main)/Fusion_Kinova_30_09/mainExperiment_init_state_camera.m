@@ -6,7 +6,7 @@ R = 1.0^2*eye(2); %measurement noise for one landmark
 ParamFilter.NbAmers = 30; %nominal number of landmarks in the state
 ParamFilter.NbAmersMin = ParamFilter.NbAmers;
 %ParamFilter.NbAmersMin = 10;
-ParamFilter.EcartPixelMax = 40; %the starting value is 20
+ParamFilter.EcartPixelMax = 25; %the starting value is 20
 
 % init covariance
 p0Rot = (0.01*pi/180)^2;
@@ -19,8 +19,8 @@ P0 = diag([p0Rot*ones(3,1);p0v*ones(3,1);p0x*ones(3,1);...
 %%
 
 % process noises - this works with im_X_A10_v18 only...
-q_omega = (2e-4)^2*200;
-q_a = (2e-3)^2*200;
+q_omega = (2e-5)^2*200; %2e-5 works best
+q_a = (2e-2)^2*200;
 q_omegab = (2e-5)^2*200;
 q_ab = (3e-2)^2*200;
 %this works - sort of

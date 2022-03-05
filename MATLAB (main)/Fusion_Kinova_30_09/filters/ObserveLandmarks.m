@@ -1,4 +1,4 @@
-function [y,yAmers,trackerMain,trackerBis,pointsMain,validityMain,myTracks,pointsBis] = ...
+function [y,yAmers,predictedPixel,trackerMain,trackerBis,pointsMain,validityMain,myTracks,pointsBis] = ...
     ObserveLandmarks(trackerMain,trackerBis,dirImage,IdxImage,...
     fileImages,ParamFilter,Rot,x,PosAmers,I,S,myTracks)
 %% trackerMain
@@ -25,6 +25,7 @@ pointsMain(pointsMain(:)<=0) = 1;
 
 y = zeros(2*sum(validityMain),1);
 yAmers = zeros(sum(validityMain),1);
+predictedPixel = zeros(2*sum(validityMain),1);
 EcartPixelMax = ParamFilter.EcartPixelMax;
 EcartPixelOut = EcartPixelMax;
 
@@ -44,6 +45,7 @@ for i = 1:length(validityMain)
         if norm(pixelEst-pointsMain(i,:)') < EcartPixelMax %reject outlier
             y(2*j-1:2*j) = pointsMain(i,:)';
             yAmers(j) = i;
+            predictedPixel(2*j-1:2*j) = pixelEst;
             disp('Valid points:');
             disp(j);
             j = j+1;
@@ -55,6 +57,7 @@ for i = 1:length(validityMain)
 end
 y(2*j-1:end) = []; %posicoes dos pixeis - td numa so coluna 
 yAmers(j:end) = []; %ids
+predictedPixel(2*j-1:end) = []; %Predicted measurements in one column
 
 %check if tracking is lost
 validPoints = find(validityMain==1);

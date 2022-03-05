@@ -150,4 +150,4 @@ legend('','','','','','Transformed sigma-points', 'Tangent space sigma-points','
 %plot3(endPoint(1),endPoint(2),1,'.','Color','#0072BD','MarkerSize',10);
 %text(endPoint(1),endPoint(2),1.2,'$\frak{g}$','interpreter','latex','FontSize',14,'FontWeight','bold');
 
-print(gcf,'propagation_legend.png','-dpng','-r300');
+%print(gcf,'propagation_legend.png','-dpng','-r300');

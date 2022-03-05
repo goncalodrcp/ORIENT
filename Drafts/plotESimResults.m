@@ -7,14 +7,14 @@ close all;
 path_to_sw = 'D:\IST\ORIENT_repos\ORIENT\MATLAB (main)\Fusion_ESim_29_09_2021\';
 addpath(genpath(path_to_sw));
 
-path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\Results\rotZ\';
+%path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\Results\rotZ\';
 %path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\201007_Fusion_2018_event_image\Results\rotY\'; %rotation on Y - yes thats correct
 %path = 'D:\IST\ORIENT_repos\ORIENT\MATLAB (main)\Fusion_ESim_29_09_2021\Results\rotX\'; %rotation on X - yes thats correct
 addpath(path);
 
-load('rotZ_18_results.mat');
+%load('rotZ_18_results.mat');
 %load('rotX_18_results.mat'); %rotation on Y - yes thats correct
-%load('rotY_18_results.mat'); %rotation on X - yes thats correct
+load('rotY_18_results.mat'); %rotation on X - yes thats correct
 
 %note:the order of rotation is ZYX(1,2,3) or(psi,theta,phi), however, there's an offset
 %rotation noticeable in the image frames and so the Y rotation is 3-theta
@@ -113,4 +113,19 @@ legend('Estimated','Ground-truth');
 %legend('SE(3)','SO(3)','Ground-truth');
 xlabel('t(s)');
 ylabel('Angle (º)');
+%print(gcf,'yAxis_8Dez.png','-dpng','-r300');
+
+%% Plot zoomed in trajectories (for better visualization)
+
+indexOfInterest_t = (t > 0.5) & (t < 3);
+indexOfInterest_GT= (tGT > 0.5) & (tGT < 3);
+
+figure;
+plot(t(indexOfInterest_t),trajSE3.phi(indexOfInterest_t)); hold on;
+title('Orientation Euler angles - Z-Axis');
+plot(tGT(indexOfInterest_GT),trajGT.phi(indexOfInterest_GT));
+legend('Estimated','Ground-truth');
+xlabel('t(s)');
+ylabel('Angle (º)');
+%print(gcf,'yAxis_zoom_8Dez.png','-dpng','-r300');
 

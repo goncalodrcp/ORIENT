@@ -9,9 +9,9 @@ addpath('filters');
 addpath('D:\IST\ORIENT_repos\ORIENT\MATLAB (main)\Helpers\ProcessRosbag');
 %location of the data
 dirDataset = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Feedback\Z-Axis';
-addpath(dirDataset);
+addpath(dirDataset)
 %Image directory 
-imageDir = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Feedback\Z-Axis\im_Z_A20_v18';
+imageDir = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Feedback\Z-Axis\im_Z_A10_v13';
 %imageDir = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Feedback\Random\im_randomSample1';
 
 freqIMU = 100; %Hz
@@ -24,10 +24,10 @@ tImagesMin = 1; % starting camera time
 %% Load data from experiment
 
 %Load feedback from MATLAB API
-load('Z_A20_v18_Sample1.mat')
+load('Z_A10_v13_Sample1.mat')
 %Load rosbag
 %bag = rosbag('Z_A10_v13_Sample1.bag');
-bag = rosbag('Z_A20_v18_Sample1.bag');
+bag = rosbag('Z_A10_v13_Sample1.bag');
 %Select topics 
 jointState_Topic = select(bag,'Topic','/my_gen3/joint_states');
 image_Topic = select(bag,'Topic','/camera/image_raw');
@@ -120,7 +120,7 @@ title('Z-Axis');
 
 %%
 
-[trajs, i] = mainExperiment_loop(orb_slam, IMU_img_struct, state_camera_struct, NbStepsMax, obsTimes, ParamFilter, ParamGlobal);
+[trajs, i, trackedFeatures, trackedFeatures_new] = mainExperiment_loop(orb_slam, IMU_img_struct, state_camera_struct, NbStepsMax, obsTimes, ParamFilter, ParamGlobal);
 
 %% Plots
 
@@ -147,9 +147,9 @@ plot(t,traj_est(3,:)); hold on;
 plot(tReal,traj_ground(3,:));
 
 %% Save results
-% 
+% % 
 % path = 'D:\IST\ORIENT_repos\Tests\ThesisSW\ESIM_test\Fusion_Kinova_30_09\Results\';
-% fileName = 'res_Z_A20_v18_MF15OK.mat';
+% fileName = 'res_Z_A10_v13_MF15_25Dez.mat';
 % save([path fileName]);
 
 

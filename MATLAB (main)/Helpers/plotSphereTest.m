@@ -66,16 +66,17 @@ endPoint = points(:,end);
 %Plot 3d points and surface line
 %Plot identity point
 plot3(startPoint(1),startPoint(2),startPoint(3),'X','Color','r','LineWidth',2);
-text(0,0,1.2,'$g$','interpreter','latex','FontSize',14,'FontWeight','bold');
+text(0,0,1.2,'$\mathbf{R}_1$','interpreter','latex','FontSize',14,'FontWeight','bold');
 %Plot another point in the Lie group
 plot3(endPoint(1),endPoint(2),endPoint(3),'.','Color','r','MarkerSize',10);
-text(endPoint(1),endPoint(2)-0.2,endPoint(3),'$g^{\prime}$','interpreter','latex','FontSize',14,'FontWeight','bold');
+text(endPoint(1),endPoint(2)-0.3,endPoint(3),'$\mathbf{R}_2$','interpreter','latex','FontSize',14,'FontWeight','bold');
 plot3(points(1,2:end-1),points(2,2:end-1),points(3,2:end-1),'-','Color','r','LineWidth',1.5);
 %Plot arbitrary point in tangent space
 plot3([startPoint(1) endPoint(1)],[startPoint(2) endPoint(2)],[1 1],'-','Color','#0072BD','LineWidth',1.5);
 plot3(endPoint(1),endPoint(2),1,'.','Color','#0072BD','MarkerSize',10);
-%text(endPoint(1),endPoint(2),1.2,'$\frak{g}$','interpreter','latex','FontSize',14,'FontWeight','bold');
-text(-0.8,0.8,1.2,'$T_{g}\mathcal{G}$','interpreter','latex','FontSize',14,'FontWeight','bold');
+text(endPoint(1),endPoint(2),1.2,'$\omega^\wedge$','interpreter','latex','FontSize',14,'FontWeight','bold');
+%text(-0.8,0.8,1.2,'$T_{g}\mathcal{G}$','interpreter','latex','FontSize',14,'FontWeight','bold');
+%text(-0.8,0.8,1.2,'$\frak{g}$','interpreter','latex','FontSize',14,'FontWeight','bold');
 set(gca,'visible','off')
 %print(gcf,'foo.png','-dpng','-r300');
 

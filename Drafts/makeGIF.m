@@ -26,21 +26,22 @@ end
 
 %% Make gif for Kinova dataset
 
-dirDataset = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_24_07\Feedback\Gonçalo\';
-addpath(dirDataset);
-load('ZAXIS_1_filter_part1.mat');
-fileImages = imageData.images;
-filename = 'zRotationKinova.gif';
+%Image directory 
+imageDir = 'D:\IST\ORIENT_repos\Tests\ThesisSW\Data collected\Experiments_14_10\Feedback\Y-Axis\im_Y_A20_v18';
+%Create image data store object
+imds = imageDatastore(imageDir);
+fileImages = imds.Files;
+filename = 'yRotationKinova_A20_v18.gif';
 
 N = length(fileImages);
 for i = 1:N
-    image = im2uint8(fileImages{i});
+    image = rgb2gray(imread(fileImages{i})); 
     %[imind,cm] = rgb2ind(image,256); 
       % Write to the GIF File 
       if i == 1 
-          imwrite(image,filename,'gif', 'Loopcount',inf,'DelayTime',0.05); 
+          imwrite(image,filename,'gif', 'Loopcount',inf,'DelayTime',0.02); 
       else 
-          imwrite(image,filename,'gif','WriteMode','append','DelayTime',0.05); 
+          imwrite(image,filename,'gif','WriteMode','append','DelayTime',0.02); 
       end 
     
 end

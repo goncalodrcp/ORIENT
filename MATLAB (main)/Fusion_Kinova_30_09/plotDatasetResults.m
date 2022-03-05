@@ -187,18 +187,26 @@ figure;hold on;
 plot(tReal_NF(2:N_NF-1)-tReal_NF(2),errorSE3_NF.errorR);
 plot(tReal_MF10(2:N_MF10-1)-tReal_MF10(2),errorSE3_MF10.errorR);
 plot(tReal_MF15(2:N_MF15-1)-tReal_MF15(2),errorSE3_MF15.errorR);
+disp('RMSE(º):');
 disp(sqrt(mean([errorSE3_NF.errorR errorSE3_MF10.errorR errorSE3_MF15.errorR].^2)));
+disp('Max error(º):');
+disp([max(errorSE3_NF.errorR) max(errorSE3_MF10.errorR) max(errorSE3_MF15.errorR)]);
 legend('No filter', 'MF10','MF15')
 xlabel('t (s)')
 ylabel('RMSE attitdude (°)')
 title('RMSE on attitude as function of time')
+%print(gcf,'YAxis_A20_v18_error.png','-dpng','-r300');
+
 
 %Plot error in position(m)
 figure; hold on;
 plot(tReal_NF(2:N_NF-1)-tReal_NF(2),errorSE3_NF.errorX);
 plot(tReal_MF10(2:N_MF10-1)-tReal_MF10(2),errorSE3_MF10.errorX);
 plot(tReal_MF15(2:N_MF15-1)-tReal_MF15(2),errorSE3_MF15.errorX);
+disp('RMSE(m):');
 disp(sqrt(mean([errorSE3_NF.errorX errorSE3_MF10.errorX errorSE3_MF15.errorX].^2)));
+disp('Max error(m):');
+disp([max(errorSE3_NF.errorX) max(errorSE3_MF10.errorX) max(errorSE3_MF15.errorX)]);
 legend('No filter', 'MF10','MF15')
 xlabel('t (s)')
 ylabel('RMSE position (m)')
@@ -238,3 +246,23 @@ plot(tReal_NF,trajGT_NF.phi);
 legend('No filter','MF10','MF15','Ground-truth')
 xlabel('t(s)');
 ylabel('Angle (º)');
+%print(gcf,'YAxis_A20_v18.png','-dpng','-r300');
+
+
+%% Plot zoomed in trajectories (for better visualization)
+
+indexOfInterest_NF = (tReal_NF > 3.0) & (tReal_NF < 9.0);
+indexOfInterest_MF10 = (tReal_MF10 > 3.0) & (tReal_MF10 < 9.0);
+indexOfInterest_MF15 = (tReal_MF15 > 3.0) & (tReal_MF15 < 9.0);
+
+figure;
+plot(tReal_NF(indexOfInterest_NF),trajSE3_NF.theta(indexOfInterest_NF)); hold on;
+title('Orientation Euler angles - Y-Axis');
+plot(tReal_MF10(indexOfInterest_MF10),trajSE3_MF10.theta(indexOfInterest_MF10));
+plot(tReal_MF15(indexOfInterest_MF15),trajSE3_MF15.theta(indexOfInterest_MF15));
+plot(tReal_NF(indexOfInterest_NF),trajGT_NF.theta(indexOfInterest_NF));
+legend('No filter','MF10','MF15','Ground-truth')
+xlabel('t(s)');
+ylabel('Angle (º)');
+%print(gcf,'YAxis_A20_v18_zoom.png','-dpng','-r300');
+

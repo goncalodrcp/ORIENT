@@ -1,4 +1,4 @@
-function [trajs, i] = mainExperiment_loop(orb_slam, IMU_img_struct, state_camera_struct, NbStepsMax, obsTimes, ParamFilter, ParamGlobal)
+function [trajs, i, trackedFeatures, trackedFeatures_new] = mainExperiment_loop(orb_slam, IMU_img_struct, state_camera_struct, NbStepsMax, obsTimes, ParamFilter, ParamGlobal)
 
 trajReal = IMU_img_struct.trajReal;
 NbSteps = IMU_img_struct.NbSteps;
@@ -139,7 +139,7 @@ for i = 2:NbStepsMax
     % if measurement
     if obsTimes(i) == 1
         % track points in image - using R-UKF
-        [y,yAmers,trackerMain,trackerBis,pointsMain,validityMain,...
+        [y,yAmers,predictedPixel,trackerMain,trackerBis,pointsMain,validityMain,...
             myTracks,pointsBis] = ...
             ObserveLandmarks(trackerMain,trackerBis,dirImage,IdxImage,...
             fileImages,ParamFilter,RotR,xR,PosAmersR,i,S_R,myTracks);
@@ -164,7 +164,7 @@ for i = 2:NbStepsMax
         
         % update other filters
         chiL = state2chi(RotL,vL,xL,PosAmersL);
-        [chiL,omega_bL,a_bL,S_L] = lukfUpdate(chiL,omega_bL,...
+        [chiL,omega_bL,a_bL,S_L,ybar] = lukfUpdate(chiL,omega_bL,...
             a_bL,S_L,y,param,R,ParamFilter);
         [RotL,vL,xL,PosAmersL] = chi2state(chiL);
         
@@ -191,12 +191,37 @@ for i = 2:NbStepsMax
         trajU = updateTraj(trajU,RotU,vU,xU,omega_bU,a_bU,i);
         trajI = updateTraj(trajI,RotI,vI,xI,omega_bI,a_bI,i);
         
+        % save tracking information
+        trackedFeatures{IdxImage-1}.i = i;
+        trackedFeatures{IdxImage-1}.idImage = IdxImage;
+        trackedFeatures{IdxImage-1}.predPixel = predictedPixel; %Predicted pixel location
+        trackedFeatures{IdxImage-1}.yAmers = yAmers; %Id of the landmarks tracked
+        trackedFeatures{IdxImage-1}.y = y; %Pixel location of the tracked landmarks
+        trackedFeatures{IdxImage-1}.ybar = ybar; %Measurement mean (after update) - similar to predicted pixel location
+        %Other info 
+        trackedFeatures{IdxImage-1}.trackerMain = trackerMain;
+        trackedFeatures{IdxImage-1}.trackerBis = trackerBis;
+        trackedFeatures{IdxImage-1}.pointsMain = pointsMain;
+        trackedFeatures{IdxImage-1}.validityMain = validityMain;
+        trackedFeatures{IdxImage-1}.pointsBis = pointsBis;
+        trackedFeatures{IdxImage-1}.myTracks = myTracks;
+        
+        
         % remplace non visible landmarks
         [S_R,PosAmersR,ParamFilter,trackerBis,myTracks,PosAmersNew,...
             IdxAmersNew,trackCov,pointsMain,validityMain] = manageAmers(S_R,...
             PosAmersR,ParamFilter,ParamGlobal,trackerBis,...
             trajR,i,pointsMain,validityMain,IdxImage,myTracks,pointsBis);
         chiR = state2chi(RotR,vR,xR,PosAmersR);
+        
+        % Save tracking if landmarks are not visible 
+        trackedFeatures_new{IdxImage-1}.trackerBis = trackerBis;
+        trackedFeatures_new{IdxImage-1}.myTracks = myTracks;
+        trackedFeatures_new{IdxImage-1}.pointsMain = pointsMain;
+        trackedFeatures_new{IdxImage-1}.validityMain = validityMain;
+        trackedFeatures_new{IdxImage-1}.PosAmersR = PosAmersR;
+        trackedFeatures_new{IdxImage-1}.PosAmersNew = PosAmersNew;
+        trackedFeatures_new{IdxImage-1}.IdxAmersNew = IdxAmersNew;
         
         %Same but for L-UKF
 %         [S_L,PosAmersL,ParamFilter,trackerBis,myTracks,PosAmersNew,...
